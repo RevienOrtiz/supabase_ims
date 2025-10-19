@@ -221,8 +221,8 @@
                             <input type="email" name="email" class="form-control form-control-sm" placeholder="Email Address" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small">9. Religion</label>
-                            <select name="religion" class="form-select form-select-sm">
+                            <label class="form-label small">9. Religion *</label>
+                            <select name="religion" id="religion" class="form-select form-select-sm" required>
                                 <option value="">Select Religion</option>
                                 <option value="Catholic">Catholic</option>
                                 <option value="Protestant">Protestant</option>
@@ -230,10 +230,16 @@
                                 <option value="Buddhism">Buddhism</option>
                                 <option value="Others">Others</option>
                             </select>
+                            <div class="invalid-feedback" id="religion-error" style="display: none;">
+                                Please select a religion.
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small">10. Ethnic Origin</label>
-                            <input type="text" name="ethnic_origin" class="form-control form-control-sm" placeholder="Ethnic Origin">
+                            <label class="form-label small">10. Ethnic Origin *</label>
+                            <input type="text" name="ethnic_origin" id="ethnic_origin" class="form-control form-control-sm" placeholder="Ethnic Origin" required>
+                            <div class="invalid-feedback" id="ethnic_origin-error" style="display: none;">
+                                Please enter ethnic origin.
+                            </div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small">11. Language Spoken *</label>
@@ -290,8 +296,8 @@
                             <label class="form-label small">20. Has Pension</label>
                             <select name="has_pension" class="form-select form-select-sm">
                                 <option value="">Select</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
+                                <option value="1">With Pension</option>
+                                <option value="0">Without Pension</option>
                             </select>
                         </div>
                     </div>
@@ -2383,6 +2389,52 @@
             if (certificationCheckbox && finalSubmitBtn) {
                 certificationCheckbox.addEventListener('change', function() {
                     finalSubmitBtn.disabled = !this.checked;
+                });
+            }
+            
+            // Add form validation for religion and ethnic origin
+            const form = document.querySelector('form[action="{{ route('seniors.store') }}"]');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let isValid = true;
+                    let errorMessage = '';
+                    
+                    // Validate religion
+                    const religionSelect = document.getElementById('religion');
+                    const religionError = document.getElementById('religion-error');
+                    if (!religionSelect.value || religionSelect.value === '') {
+                        religionSelect.classList.add('is-invalid');
+                        religionError.style.display = 'block';
+                        isValid = false;
+                        errorMessage += '• Please select a religion.\n';
+                    } else {
+                        religionSelect.classList.remove('is-invalid');
+                        religionError.style.display = 'none';
+                    }
+                    
+                    // Validate ethnic origin
+                    const ethnicOriginInput = document.getElementById('ethnic_origin');
+                    const ethnicOriginError = document.getElementById('ethnic_origin-error');
+                    if (!ethnicOriginInput.value || ethnicOriginInput.value.trim() === '') {
+                        ethnicOriginInput.classList.add('is-invalid');
+                        ethnicOriginError.style.display = 'block';
+                        isValid = false;
+                        errorMessage += '• Please enter ethnic origin.\n';
+                    } else {
+                        ethnicOriginInput.classList.remove('is-invalid');
+                        ethnicOriginError.style.display = 'none';
+                    }
+                    
+                    if (!isValid) {
+                        // Show error message using custom modal
+                        showValidationErrorModal('Validation Error', errorMessage);
+                        return false;
+                    }
+                    
+                    // If validation passes, submit the form
+                    form.submit();
                 });
             }
         });

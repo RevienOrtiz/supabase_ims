@@ -332,8 +332,8 @@ class SeniorController extends Controller
             'sex' => 'required|string|in:Male,Female',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
-            'religion' => 'nullable|string|max:255',
-            'ethnic_origin' => 'nullable|string|max:255',
+            'religion' => 'required|string|max:255',
+            'ethnic_origin' => 'required|string|max:255',
             'language' => 'required|string|max:255',
             'osca_id' => 'required|string|max:50|unique:seniors,osca_id,' . $id,
             'gsis_sss' => 'nullable|string|max:50',
@@ -393,18 +393,22 @@ class SeniorController extends Controller
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($senior->photo_path && Storage::disk('public')->exists($senior->photo_path)) {
-                Storage::disk('public')->delete($senior->photo_path);
+            // Delete old photo if exists (check both public and private storage)
+            if ($senior->photo_path) {
+                if (Storage::disk('public')->exists($senior->photo_path)) {
+                    Storage::disk('public')->delete($senior->photo_path);
+                } elseif (Storage::disk('private')->exists($senior->photo_path)) {
+                    Storage::disk('private')->delete($senior->photo_path);
+                }
             }
             
-            // Store new photo
-            $photoPath = $request->file('photo')->store('senior-photos', 'public');
+            // SECURITY: Store photo in private storage (not publicly accessible)
+            $photoPath = $request->file('photo')->store('senior-photos', 'private');
             $validatedData['photo_path'] = $photoPath;
         }
 
             $senior->update($validatedData);
-            Log::info('Senior updated successfully', ['id' => $id, 'senior_name' => $senior->first_name . ' ' . $senior->last_name]);
+            Log::info('Senior updated successfully', ['id' => $id]);
 
             // Clear relevant caches
             $this->clearRelevantCaches();
@@ -415,8 +419,8 @@ class SeniorController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation error in senior update', [
                 'senior_id' => $id,
-                'errors' => $e->errors(),
-                'input' => $request->all()
+                'errors' => $e->errors()
+                // SECURITY: Don't log sensitive input data
             ]);
             return redirect()->back()
                 ->withErrors($e->errors())
@@ -424,14 +428,13 @@ class SeniorController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception in senior update', [
                 'senior_id' => $id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'error' => $e->getMessage()
+                // SECURITY: Don't log sensitive request data or stack traces
             ]);
             
-            // For debugging - show the actual error message
+            // SECURITY: Don't expose system error details to users
             return redirect()->back()
-                ->with('error', 'Error: ' . $e->getMessage() . ' Please check the logs for more details.');
+                ->with('error', 'An error occurred while updating the senior record. Please try again.');
         }
     }
 
@@ -460,8 +463,8 @@ class SeniorController extends Controller
             'sex' => 'required|string|in:Male,Female',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
-            'religion' => 'nullable|string|max:255',
-            'ethnic_origin' => 'nullable|string|max:255',
+            'religion' => 'required|string|max:255',
+            'ethnic_origin' => 'required|string|max:255',
             'language' => 'required|string|max:255',
             'osca_id' => 'required|string|max:50|unique:seniors,osca_id',
             'gsis_sss' => 'nullable|string|max:50',
@@ -514,6 +517,8 @@ class SeniorController extends Controller
             'scheduled_checkup' => 'nullable|string|max:255',
             'checkup_frequency' => 'nullable|string|max:255',
             'certification' => 'required|accepted',
+            // SECURITY: Secure file upload validation
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         // Convert boolean fields properly
@@ -1316,5 +1321,30 @@ class SeniorController extends Controller
                 ->with('error', 'Unable to update benefits application. Please check all required fields and try again.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Securely serve senior photos from private storage
+     */
+    public function servePhoto(string $id)
+    {
+        $senior = Senior::findOrFail($id);
+        
+        if (!$senior->photo_path) {
+            abort(404, 'Photo not found');
+        }
+        
+        // Check if file exists in private storage
+        if (!Storage::disk('private')->exists($senior->photo_path)) {
+            abort(404, 'Photo file not found');
+        }
+        
+        // Return the file with proper headers
+        $file = Storage::disk('private')->get($senior->photo_path);
+        $mimeType = mime_content_type(Storage::disk('private')->path($senior->photo_path));
+        
+        return response($file, 200)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', 'inline; filename="' . basename($senior->photo_path) . '"');
     }
 }

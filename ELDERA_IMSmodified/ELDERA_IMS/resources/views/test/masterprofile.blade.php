@@ -357,7 +357,6 @@
                                                     // First try exact matches in the data object
                                                     for (const pattern of patterns) {
                                                         if (data[pattern] !== undefined && data[pattern] !== null && data[pattern] !== '') {
-                                                            console.log(`Found ${pattern} with value: ${data[pattern]}`);
                                                             return data[pattern];
                                                         }
                                                     }
@@ -367,7 +366,6 @@
                                                         const keyLower = key.toLowerCase();
                                                         for (const pattern of patterns) {
                                                             if (keyLower.includes(pattern.toLowerCase())) {
-                                                                console.log(`Found similar key ${key} matching pattern ${pattern} with value: ${data[key]}`);
                                                                 return data[key];
                                                             }
                                                         }

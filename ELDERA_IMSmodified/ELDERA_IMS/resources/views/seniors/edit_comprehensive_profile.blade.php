@@ -229,8 +229,8 @@
                         <div class="row g-2">
                            
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small">9. RELIGION</label>
-                                <select name="religion" class="form-control form-control-sm">
+                                <label class="form-label fw-bold small">9. RELIGION *</label>
+                                <select name="religion" id="religion" class="form-control form-control-sm" required>
                                     <option value="">Select Religion</option>
                                 <option value="Catholic" {{ old('religion', $senior->religion) == 'Catholic' ? 'selected' : '' }}>Catholic</option>
                                 <option value="Protestant" {{ old('religion', $senior->religion) == 'Protestant' ? 'selected' : '' }}>Protestant</option>
@@ -238,10 +238,16 @@
                                 <option value="Buddhism" {{ old('religion', $senior->religion) == 'Buddhism' ? 'selected' : '' }}>Buddhism</option>
                                 <option value="Others" {{ old('religion', $senior->religion) == 'Others' ? 'selected' : '' }}>Others</option>
                                 </select>
+                                <div class="invalid-feedback" id="religion-error" style="display: none;">
+                                    Please select a religion.
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold small">10. ETHNIC ORIGIN</label>
-                                <input type="text" name="ethnic_origin" class="form-control form-control-sm" placeholder="Ethnic Origin" value="{{ old('ethnic_origin', $senior->ethnic_origin) }}">
+                                <label class="form-label fw-bold small">10. ETHNIC ORIGIN *</label>
+                                <input type="text" name="ethnic_origin" id="ethnic_origin" class="form-control form-control-sm" placeholder="Ethnic Origin" value="{{ old('ethnic_origin', $senior->ethnic_origin) }}" required>
+                                <div class="invalid-feedback" id="ethnic_origin-error" style="display: none;">
+                                    Please enter ethnic origin.
+                                </div>
                             </div>
                         </div>
                         <div class="row g-2">
@@ -1247,6 +1253,42 @@
         
         // Confirmation function for updating senior profile
     function confirmUpdate() {
+        // Validate religion and ethnic origin before showing confirmation
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Validate religion
+        const religionSelect = document.getElementById('religion');
+        const religionError = document.getElementById('religion-error');
+        if (!religionSelect.value || religionSelect.value === '') {
+            religionSelect.classList.add('is-invalid');
+            religionError.style.display = 'block';
+            isValid = false;
+            errorMessage += '• Please select a religion.\n';
+        } else {
+            religionSelect.classList.remove('is-invalid');
+            religionError.style.display = 'none';
+        }
+        
+        // Validate ethnic origin
+        const ethnicOriginInput = document.getElementById('ethnic_origin');
+        const ethnicOriginError = document.getElementById('ethnic_origin-error');
+        if (!ethnicOriginInput.value || ethnicOriginInput.value.trim() === '') {
+            ethnicOriginInput.classList.add('is-invalid');
+            ethnicOriginError.style.display = 'block';
+            isValid = false;
+            errorMessage += '• Please enter ethnic origin.\n';
+        } else {
+            ethnicOriginInput.classList.remove('is-invalid');
+            ethnicOriginError.style.display = 'none';
+        }
+        
+        if (!isValid) {
+            // Show error message using custom modal
+            showValidationErrorModal('Validation Error', errorMessage);
+            return false;
+        }
+        
         const firstName = document.querySelector('input[name="first_name"]').value || 'Senior';
         const lastName = document.querySelector('input[name="last_name"]').value || 'Citizen';
         
