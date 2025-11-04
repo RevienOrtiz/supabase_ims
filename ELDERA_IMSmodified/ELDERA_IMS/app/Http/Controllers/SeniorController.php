@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View as ViewFacade;
+use Illuminate\Support\Facades\Schema;
 
 class SeniorController extends Controller
 {
@@ -179,12 +180,17 @@ class SeniorController extends Controller
     public function destroy(string $id): RedirectResponse
     {
         $senior = Senior::findOrFail($id);
-        
-        // Soft delete the senior
-        $senior->delete();
+
+        // Remove associated files safely
+        if (!empty($senior->photo_path)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($senior->photo_path);
+        }
+
+        // Permanently delete the senior (not just soft delete)
+        $senior->forceDelete();
 
         return redirect()->route('seniors')
-            ->with('success', 'Senior citizen record deleted successfully');
+            ->with('success', 'Senior citizen record permanently deleted successfully');
     }
 
     /**
@@ -379,7 +385,7 @@ class SeniorController extends Controller
             'area_difficulty' => 'nullable',
             'maintenance_medicines' => 'nullable|string',
             'scheduled_checkup' => 'nullable|string|max:255',
-            'checkup_frequency' => 'nullable|string|max:255',
+            'checkup_frequency' => 'nullable|string|max:255|required_if:scheduled_checkup,Yes',
             // CERTIFICATION
             'certification' => 'required|accepted',
             // PHOTO
@@ -390,6 +396,151 @@ class SeniorController extends Controller
         $validatedData['can_travel'] = $request->input('can_travel') === 'Yes' ? true : false;
         $validatedData['has_pension'] = $request->input('has_pension') == '1' ? true : false;
         $validatedData['certification'] = $request->input('certification') === 'on' ? true : false;
+
+        // Helper to merge "Others" text into checkbox arrays
+        $mergeArrayOthers = function ($arr, $othersText) {
+            $arr = is_array($arr) ? $arr : (empty($arr) ? [] : (array) $arr);
+            $text = is_string($othersText) ? trim($othersText) : '';
+            if ($text === '') {
+                return $arr;
+            }
+            $replaced = false;
+            foreach ($arr as $i => $v) {
+                if (is_string($v) && strcasecmp($v, 'Others') === 0) {
+                    $arr[$i] = $text;
+                    $replaced = true;
+                }
+            }
+            if (!$replaced) {
+                $arr[] = $text;
+            }
+            return $arr;
+        };
+
+        // Merge "Others, specify" fields into their respective arrays
+        $validatedData['skills'] = $mergeArrayOthers($request->input('skills'), $request->input('skills_others_specify'));
+        $validatedData['community_activities'] = $mergeArrayOthers($request->input('community_activities'), $request->input('community_activities_others_specify'));
+        $validatedData['living_with'] = $mergeArrayOthers($request->input('living_with'), $request->input('living_with_others_specify'));
+        $validatedData['household_condition'] = $mergeArrayOthers($request->input('household_condition'), $request->input('household_condition_others_specify'));
+        $validatedData['source_of_income'] = $mergeArrayOthers($request->input('source_of_income'), $request->input('source_of_income_others'));
+        $validatedData['real_assets'] = $mergeArrayOthers($request->input('real_assets'), $request->input('assets_real_and_immovable_others'));
+        $validatedData['personal_assets'] = $mergeArrayOthers($request->input('personal_assets'), $request->input('personal_assets_others'));
+        $validatedData['problems_needs'] = $mergeArrayOthers($request->input('problems_needs'), $request->input('problems_needs_others'));
+        $validatedData['health_problems'] = $mergeArrayOthers($request->input('health_problems'), $request->input('health_problems_others'));
+        $validatedData['dental_concern'] = $mergeArrayOthers($request->input('dental_concern'), $request->input('dental_concern_others'));
+        $validatedData['visual_concern'] = $mergeArrayOthers($request->input('visual_concern'), $request->input('visual_concern_others'));
+        $validatedData['hearing_condition'] = $mergeArrayOthers($request->input('hearing_condition'), $request->input('hearing_condition_others'));
+        $validatedData['social_emotional'] = $mergeArrayOthers($request->input('social_emotional'), $request->input('social_emotional_others'));
+        $validatedData['area_difficulty'] = $mergeArrayOthers($request->input('area_difficulty'), $request->input('area_difficulty_others'));
+
+        // For single-select with 'Others' option: replace 'Others' with specified text
+        if (is_string($request->input('education_others_specify')) && trim($request->input('education_others_specify')) !== '') {
+            if (isset($validatedData['education_level']) && is_string($validatedData['education_level']) && strcasecmp($validatedData['education_level'], 'Others') === 0) {
+                $validatedData['education_level'] = trim($request->input('education_others_specify'));
+            }
+        }
+
+        // Parse dynamic Children rows into array of objects
+        $children = [];
+        foreach ($request->all() as $key => $value) {
+            if (preg_match('/^child_(name|occupation|income|age|working)_(\d+)$/', $key, $m)) {
+                $field = $m[1];
+                $index = (int)$m[2];
+                if (!isset($children[$index])) {
+                    $children[$index] = [
+                        'name' => null,
+                        'occupation' => null,
+                        'income' => null,
+                        'age' => null,
+                        'working' => null,
+                    ];
+                }
+                $children[$index][$field] = $value;
+            }
+        }
+        // Remove empty child rows (no name and no occupation)
+        $children = array_values(array_filter($children, function ($row) {
+            return !empty($row['name']) || !empty($row['occupation']) || !empty($row['income']) || !empty($row['age']) || !empty($row['working']);
+        }));
+
+        // Debug: Log parsed children/dependents before validation
+        Log::info('Update parsed family composition', [
+            'children_count' => count($children),
+            'children' => $children,
+        ]);
+
+        // Debug: Log parsed children/dependents before validation
+        Log::info('Store parsed family composition', [
+            'children_count' => count($children),
+            'children' => $children,
+        ]);
+
+        // Parse dynamic Other Dependents into array of objects
+        $dependents = [];
+        foreach ($request->all() as $key => $value) {
+            if (preg_match('/^dependent_(name|occupation|income|age|working)_(\d+)$/', $key, $m)) {
+                $field = $m[1];
+                $index = (int)$m[2];
+                if (!isset($dependents[$index])) {
+                    $dependents[$index] = [
+                        'name' => null,
+                        'occupation' => null,
+                        'income' => null,
+                        'age' => null,
+                        'working' => null,
+                    ];
+                }
+                $dependents[$index][$field] = $value;
+            }
+        }
+        $dependents = array_values(array_filter($dependents, function ($row) {
+            return !empty($row['name']) || !empty($row['occupation']) || !empty($row['income']) || !empty($row['age']) || !empty($row['working']);
+        }));
+
+        Log::info('Update parsed dependents', [
+            'dependents_count' => count($dependents),
+            'dependents' => $dependents,
+        ]);
+
+        Log::info('Store parsed dependents', [
+            'dependents_count' => count($dependents),
+            'dependents' => $dependents,
+        ]);
+
+        // Validate parsed children/dependents arrays separately (dynamic rows)
+        \Illuminate\Support\Facades\Validator::make(
+            [
+                'children' => $children,
+                'dependent' => $dependents,
+            ],
+            [
+                'children' => 'nullable|array',
+                'children.*.name' => 'nullable|string|max:255',
+                'children.*.occupation' => 'nullable|string|max:255',
+                'children.*.income' => 'nullable|numeric|min:0',
+                'children.*.age' => 'nullable|integer|min:0|max:120',
+                'children.*.working' => 'nullable|string|max:50',
+                'dependent' => 'nullable|array',
+                'dependent.*.name' => 'nullable|string|max:255',
+                'dependent.*.occupation' => 'nullable|string|max:255',
+                'dependent.*.income' => 'nullable|numeric|min:0',
+                'dependent.*.age' => 'nullable|integer|min:0|max:120',
+                'dependent.*.working' => 'nullable|string|max:50',
+            ]
+        )->validate();
+
+        // Attach arrays to validatedData for persistence — always save to their columns
+        if (!empty($children)) {
+            $validatedData['children'] = $children;
+        }
+        if (!empty($dependents)) {
+            $validatedData['dependent'] = $dependents;
+        }
+
+        Log::info('Update attaching arrays to validatedData', [
+            'children_in_validated' => $validatedData['children'] ?? null,
+            'dependent_in_validated' => $validatedData['dependent'] ?? null,
+        ]);
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
@@ -452,17 +603,17 @@ class SeniorController extends Controller
             'province' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'barangay' => 'required|string|max:255',
-            'residence' => 'required|string|max:255',
+            'residence' => 'nullable|string|max:255',
             'street' => 'nullable|string|max:255',
             'date_of_birth' => 'required|date|before:today',
             'birth_place' => 'required|string|max:255',
             'marital_status' => 'required|string|in:Single,Married,Widowed,Separated,Others',
             'sex' => 'required|string|in:Male,Female',
             'contact_number' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'religion' => 'nullable|string|max:255',
             'ethnic_origin' => 'nullable|string|max:255',
-            'language' => 'required|string|max:255',
+            'language' => 'nullable|string|max:255',
             'osca_id' => 'required|string|max:50|unique:seniors,osca_id',
             'gsis_sss' => 'nullable|string|max:50',
             'tin' => 'nullable|string|max:50',
@@ -512,7 +663,7 @@ class SeniorController extends Controller
             'area_difficulty' => 'nullable',
             'maintenance_medicines' => 'nullable|string',
             'scheduled_checkup' => 'nullable|string|max:255',
-            'checkup_frequency' => 'nullable|string|max:255',
+            'checkup_frequency' => 'nullable|string|max:255|required_if:scheduled_checkup,Yes',
             'certification' => 'required|accepted',
         ]);
 
@@ -520,6 +671,134 @@ class SeniorController extends Controller
         $validatedData['can_travel'] = $request->input('can_travel') === 'Yes' ? true : false;
         $validatedData['has_pension'] = $request->input('has_pension') === 'Yes' ? true : false;
         $validatedData['certification'] = $request->input('certification') === 'on' ? true : false;
+
+        // Provide safe defaults for non-nullable DB columns when fields are omitted
+        $validatedData['residence'] = $validatedData['residence'] ?? 'Not specified';
+        $validatedData['language'] = $validatedData['language'] ?? 'Not specified';
+
+        // Helper to merge "Others" text into checkbox arrays
+        $mergeArrayOthers = function ($arr, $othersText) {
+            $arr = is_array($arr) ? $arr : (empty($arr) ? [] : (array) $arr);
+            $text = is_string($othersText) ? trim($othersText) : '';
+            if ($text === '') {
+                return $arr;
+            }
+            // Replace any 'Others' entry with the specified text; if none, append
+            $replaced = false;
+            foreach ($arr as $i => $v) {
+                if (is_string($v) && strcasecmp($v, 'Others') === 0) {
+                    $arr[$i] = $text;
+                    $replaced = true;
+                }
+            }
+            if (!$replaced) {
+                $arr[] = $text;
+            }
+            return $arr;
+        };
+
+        // Merge "Others, specify" fields into their respective arrays
+        $validatedData['skills'] = $mergeArrayOthers($request->input('skills'), $request->input('skills_others_specify'));
+        $validatedData['community_activities'] = $mergeArrayOthers($request->input('community_activities'), $request->input('community_activities_others_specify'));
+        $validatedData['living_with'] = $mergeArrayOthers($request->input('living_with'), $request->input('living_with_others_specify'));
+        $validatedData['household_condition'] = $mergeArrayOthers($request->input('household_condition'), $request->input('household_condition_others_specify'));
+        $validatedData['source_of_income'] = $mergeArrayOthers($request->input('source_of_income'), $request->input('source_of_income_others'));
+        $validatedData['real_assets'] = $mergeArrayOthers($request->input('real_assets'), $request->input('assets_real_and_immovable_others'));
+        $validatedData['personal_assets'] = $mergeArrayOthers($request->input('personal_assets'), $request->input('personal_assets_others'));
+        $validatedData['problems_needs'] = $mergeArrayOthers($request->input('problems_needs'), $request->input('problems_needs_others'));
+        $validatedData['health_problems'] = $mergeArrayOthers($request->input('health_problems'), $request->input('health_problems_others'));
+        $validatedData['dental_concern'] = $mergeArrayOthers($request->input('dental_concern'), $request->input('dental_concern_others'));
+        $validatedData['visual_concern'] = $mergeArrayOthers($request->input('visual_concern'), $request->input('visual_concern_others'));
+        $validatedData['hearing_condition'] = $mergeArrayOthers($request->input('hearing_condition'), $request->input('hearing_condition_others'));
+        $validatedData['social_emotional'] = $mergeArrayOthers($request->input('social_emotional'), $request->input('social_emotional_others'));
+        $validatedData['area_difficulty'] = $mergeArrayOthers($request->input('area_difficulty'), $request->input('area_difficulty_others'));
+
+        // For single-select with 'Others' option: replace 'Others' with specified text
+        if (is_string($request->input('education_others_specify')) && trim($request->input('education_others_specify')) !== '') {
+            if (isset($validatedData['education_level']) && is_string($validatedData['education_level']) && strcasecmp($validatedData['education_level'], 'Others') === 0) {
+                $validatedData['education_level'] = trim($request->input('education_others_specify'));
+            }
+        }
+
+        // Parse dynamic Children rows into array of objects
+        $children = [];
+        foreach ($request->all() as $key => $value) {
+            if (preg_match('/^child_(name|occupation|income|age|working)_(\d+)$/', $key, $m)) {
+                $field = $m[1];
+                $index = (int)$m[2];
+                if (!isset($children[$index])) {
+                    $children[$index] = [
+                        'name' => null,
+                        'occupation' => null,
+                        'income' => null,
+                        'age' => null,
+                        'working' => null,
+                    ];
+                }
+                $children[$index][$field] = $value;
+            }
+        }
+        // Remove empty child rows (no name and no occupation)
+        $children = array_values(array_filter($children, function ($row) {
+            return !empty($row['name']) || !empty($row['occupation']) || !empty($row['income']) || !empty($row['age']) || !empty($row['working']);
+        }));
+
+        // Parse dynamic Other Dependents into array of objects
+        $dependents = [];
+        foreach ($request->all() as $key => $value) {
+            if (preg_match('/^dependent_(name|occupation|income|age|working)_(\d+)$/', $key, $m)) {
+                $field = $m[1];
+                $index = (int)$m[2];
+                if (!isset($dependents[$index])) {
+                    $dependents[$index] = [
+                        'name' => null,
+                        'occupation' => null,
+                        'income' => null,
+                        'age' => null,
+                        'working' => null,
+                    ];
+                }
+                $dependents[$index][$field] = $value;
+            }
+        }
+        $dependents = array_values(array_filter($dependents, function ($row) {
+            return !empty($row['name']) || !empty($row['occupation']) || !empty($row['income']) || !empty($row['age']) || !empty($row['working']);
+        }));
+
+        // Validate parsed children/dependents arrays separately (dynamic rows)
+        \Illuminate\Support\Facades\Validator::make(
+            [
+                'children' => $children,
+                'dependent' => $dependents,
+            ],
+            [
+                'children' => 'nullable|array',
+                'children.*.name' => 'nullable|string|max:255',
+                'children.*.occupation' => 'nullable|string|max:255',
+                'children.*.income' => 'nullable|numeric|min:0',
+                'children.*.age' => 'nullable|integer|min:0|max:120',
+                'children.*.working' => 'nullable|string|max:50',
+                'dependent' => 'nullable|array',
+                'dependent.*.name' => 'nullable|string|max:255',
+                'dependent.*.occupation' => 'nullable|string|max:255',
+                'dependent.*.income' => 'nullable|numeric|min:0',
+                'dependent.*.age' => 'nullable|integer|min:0|max:120',
+                'dependent.*.working' => 'nullable|string|max:50',
+            ]
+        )->validate();
+
+        // Attach arrays to validatedData for persistence — always save to their columns
+        if (!empty($children)) {
+            $validatedData['children'] = $children;
+        }
+        if (!empty($dependents)) {
+            $validatedData['dependent'] = $dependents;
+        }
+
+        Log::info('Store attaching arrays to validatedData', [
+            'children_in_validated' => $validatedData['children'] ?? null,
+            'dependent_in_validated' => $validatedData['dependent'] ?? null,
+        ]);
 
         $senior = Senior::create($validatedData);
         Log::info('Senior created successfully', ['id' => $senior->id, 'name' => $senior->first_name . ' ' . $senior->last_name]);

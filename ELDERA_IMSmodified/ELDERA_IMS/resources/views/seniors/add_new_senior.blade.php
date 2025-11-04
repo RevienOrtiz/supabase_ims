@@ -22,8 +22,21 @@
                 </div>
                 
                 <div class="form-content">
-                <form method="POST" action="{{ route('seniors.store') }}" enctype="multipart/form-data">
-                    @csrf
+            <form method="POST" action="{{ route('seniors.store') }}" enctype="multipart/form-data" id="addSeniorForm">
+            @csrf
+            <!-- Hidden certification field to satisfy backend 'accepted' validation -->
+            <input type="hidden" name="certification" id="certificationField" value="">
+
+            @if ($errors->any())
+                <div class="alert alert-danger mt-3">
+                    <strong>There were problems with your submission:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
 
                 <div class="form-step active" id="step1">
@@ -163,7 +176,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small">House No./Zone/Purok/Sitio</label>
-                                <input type="text" name="residence" class="form-control form-control-sm" placeholder="House No./Zone/Purok/Sitio">
+                            <input type="text" name="residence" class="form-control form-control-sm" placeholder="House No./Zone/Purok/Sitio">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small">Street</label>
@@ -208,7 +221,7 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small">7. Contact Number <span style="color: red;">*</span></label>
-                            <input type="tel" name="contact_number" class="form-control form-control-sm" placeholder="Contact Number" required>
+                            <input type="tel" name="contact_number" class="form-control form-control-sm" placeholder="Contact Number" required onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                     </div>
 
@@ -222,10 +235,18 @@
                             <label class="form-label small">9. Religion</label>
                             <select name="religion" class="form-select form-select-sm">
                                 <option value="">Select Religion</option>
-                                <option value="Catholic">Catholic</option>
-                                <option value="Protestant">Protestant</option>
+                                <option value="Roman Catholic">Roman Catholic</option>
+                                <option value="Iglesia ni Cristo">Iglesia ni Cristo</option>
+                                <option value="Evangelical">Evangelical</option>
+                                <option value="Baptist">Baptist</option>
+                                <option value="Methodist">Methodist</option>
+                                <option value="Seventh Day Adventist">Seventh Day Adventist</option>
                                 <option value="Islam">Islam</option>
                                 <option value="Buddhism">Buddhism</option>
+                                <option value="Jehovah's Witness">Jehovah's Witness</option>
+                                <option value="Born Again Christian">Born Again Christian</option>
+                                <option value="Aglipayan">Aglipayan</option>
+                                <option value="None">None</option>
                                 <option value="Others">Others</option>
                             </select>
                         </div>
@@ -243,15 +264,15 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label small">12. OSCA ID No. <span style="color: red;">*</span></label>
-                            <input type="text" name="osca_id" class="form-control form-control-sm" placeholder="OSCA ID Number" required>
+                            <input type="text" name="osca_id" class="form-control form-control-sm" placeholder="OSCA ID Number" required onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">13. GSIS/SSS No.</label>
-                            <input type="text" name="gsis_sss" class="form-control form-control-sm" placeholder="GSIS/SSS Number">
+                            <input type="text" name="gsis_sss" class="form-control form-control-sm" placeholder="GSIS/SSS Number" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">14. TIN</label>
-                            <input type="text" name="tin" class="form-control form-control-sm" placeholder="Tax Identification Number">
+                            <input type="text" name="tin" class="form-control form-control-sm" placeholder="Tax Identification Number" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                     </div>
 
@@ -259,15 +280,15 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <label class="form-label small">15. PhilHealth No.</label>
-                            <input type="text" name="philhealth" class="form-control form-control-sm" placeholder="PhilHealth Number">
+                            <input type="text" name="philhealth" class="form-control form-control-sm" placeholder="PhilHealth Number" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">16. SC Association ID No.</label>
-                            <input type="text" name="sc_association" class="form-control form-control-sm" placeholder="Senior Citizen Association ID">
+                            <input type="text" name="sc_association" class="form-control form-control-sm" placeholder="Senior Citizen Association ID" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small">17. Other Gov't ID No.</label>
-                            <input type="text" name="other_govt_id" class="form-control form-control-sm" placeholder="Other Government ID">
+                            <input type="text" name="other_govt_id" class="form-control form-control-sm" placeholder="Other Government ID" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
                         </div>
                     </div>
 
@@ -375,20 +396,34 @@
                                         <th>Income (Optional)</th>
                                         <th>Age</th>
                                         <th>Is Working?</th>
+                                        <th class="align-middle text-center">
+                                            <div class="d-flex justify-content-center align-items-center">
+                                                
+                                                <button type="button" class="table-action-add" id="addChildBtn" title="Add Child Row">
+                                                    <i class="fas fa-plus"></i>
+                                                    
+                                                </button>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @for($i = 1; $i <= 5; $i++)
+                                <tbody id="childrenTableBody">
+                                    @for($i = 1; $i <= 2; $i++)
                                     <tr>
-                                        <td><input type="text" name="child_name_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Child Name"></td>
+                                        <td><input type="text" name="child_name_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Last Name, First Name, Middle Name"></td>
                                         <td><input type="text" name="child_occupation_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Occupation"></td>
-                                        <td><input type="text" name="child_income_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Income"></td>
-                                        <td><input type="number" name="child_age_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Age"></td>
+                                        <td><input type="text" name="child_income_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Income" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                                        <td><input type="text" name="child_age_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Age" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
                                         <td><select name="child_working_{{ $i }}" class="form-select form-select-sm border-0">
                                             <option value="">Is working?</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
                                         </select></td>
+                                        <td class="text-center">
+                                            <button type="button" class="table-action-delete delete-child-row" title="Delete Row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                     @endfor
                                 </tbody>
@@ -409,20 +444,34 @@
                                         <th>Income</th>
                                         <th>Age</th>
                                         <th>Is Working?</th>
+                                        <th class="align-middle text-center">
+                                            <div class="d-flex justify-content-center align-items-center">
+                                           
+                                                <button type="button" class="table-action-add" id="addDependentBtn" title="Add Dependent Row">
+                                                    <i class="fas fa-plus"></i>
+                                                    
+                                                </button>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="dependentsTableBody">
                                     @for($i = 1; $i <= 2; $i++)
                                     <tr>
                                         <td><input type="text" name="dependent_name_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Name of Dependent"></td>
                                         <td><input type="text" name="dependent_occupation_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Occupation of Dependent"></td>
-                                        <td><input type="text" name="dependent_income_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Income"></td>
-                                        <td><input type="number" name="dependent_age_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Age"></td>
+                                        <td><input type="text" name="dependent_income_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Income" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                                        <td><input type="text" name="dependent_age_{{ $i }}" class="form-control form-control-sm border-0" placeholder="Age" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
                                         <td><select name="dependent_working_{{ $i }}" class="form-select form-select-sm border-0">
                                             <option value="">Is Working?</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
                                         </select></td>
+                                        <td class="text-center">
+                                            <button type="button" class="table-action-delete delete-dependent-row" title="Delete Row">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                     @endfor
                                 </tbody>
@@ -662,8 +711,8 @@
                             <div class="mb-3">
                                 <label class="input-label">35. Monthly Income <em>(in Philippine Peso)</em></label>
                                 <div class="mt-2">
-                                    <input type="number" name="monthly_income" class="form-control form-control-sm" placeholder="Enter monthly income amount" value="{{ old('monthly_income', 0) }}" min="0" step="0.01">
-                                    <small class="text-muted">Please enter the exact monthly income amount</small>
+                                    <input type="text" name="monthly_income" class="form-control form-control-sm" placeholder="Enter monthly income amount" value="{{ old('monthly_income', 0) }}" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)">
+                                    <small class="text-muted">Please enter the exact monthly income amount (numbers only)</small>
                                 </div>
                             </div>
 
@@ -822,7 +871,7 @@
 
                             <div class="mb-4">
                                 <label class="input-label">44. Do you have a scheduled medical/physical check-up?</label>
-                                <select name="scheduled_checkup" class="form-control mt-3">
+                                <select name="scheduled_checkup" id="scheduled_checkup" class="form-control mt-3" onchange="toggleCheckupFrequency()">
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
@@ -830,8 +879,8 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="input-label">45. If Yes, when is it done?</label>
-                                <select name="checkup_frequency" class="form-control mt-3">
+                                <label class="input-label">45. If Yes, when is it done? <span id="checkup_frequency_required" class="text-danger" style="display: none;">*</span></label>
+                                <select name="checkup_frequency" id="checkup_frequency" class="form-control mt-3">
                                     <option value="">Select</option>
                                     <option value="Monthly">Monthly</option>
                                     <option value="Quarterly">Quarterly</option>
@@ -871,7 +920,7 @@
                             <div class="col-md-12">
                                 <div class="mb-4">
                                     <div class="photo-upload-section" style="display: flex; justify-content: center; align-items: center;">
-                                        <x-photo-upload id="senior_photo" name="senior_photo" />
+                                        <x-photo-upload id="senior_photo" name="photo" />
                                     </div>
                                 </div>
                             </div>
@@ -1919,11 +1968,56 @@
         }
         
         .step-navigation .btn-success:hover,
-        .step-navigation #submitBtn:hover {
-             background-color: #ffb7ce;
-            border-color: #ffb7ce;
-            color: #e31575;
-        }
+            .step-navigation #submitBtn:hover {
+             	 background-color: #ffb7ce;
+                border-color: #ffb7ce;
+                color: #e31575;
+            }
+
+            /* ===== Table Action Buttons (Professional style) ===== */
+            .table-action-add {
+                width: 28px;
+                height: 28px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #c01060;
+                background: #fff;
+                border: 2px solid #ffb7ce;
+                border-radius: 50%;
+                box-shadow: none;
+                transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+            }
+            .table-action-add:hover {
+                background-color: #fff8fb;
+                border-color: #e31575;
+                transform: translateY(-1px);
+            }
+            .table-action-add i {
+                font-size: 12px;
+            }
+
+            .table-action-delete {
+                width: 28px;
+                height: 28px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: #c01060;
+                background: #fff;
+                border: 2px solid #ffb7ce;
+                border-radius: 50%;
+                box-shadow: none;
+                transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+            }
+            .table-action-delete:hover {
+                background-color: #fff8fb;
+                border-color: #e31575;
+                transform: translateY(-1px);
+            }
+            .table-action-delete i {
+                font-size: 12px;
+            }
         
         .step-navigation .btn:hover {
             transform: translateY(-2px);
@@ -2458,6 +2552,28 @@
                 }
             }
             
+            // Special validation for checkup frequency in step 6 (health profile)
+            if (currentStep === 6) {
+                const scheduledCheckup = document.getElementById('scheduled_checkup');
+                const checkupFrequency = document.getElementById('checkup_frequency');
+                
+                if (scheduledCheckup && checkupFrequency && scheduledCheckup.value === 'Yes' && checkupFrequency.value === '') {
+                    checkupFrequency.style.borderColor = '#dc3545';
+                    checkupFrequency.style.borderWidth = '2px';
+                    
+                    checkupFrequency.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        checkupFrequency.focus();
+                        checkupFrequency.style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            checkupFrequency.style.animation = '';
+                        }, 500);
+                    }, 300);
+                    
+                    return false;
+                }
+            }
+            
             // Get all required fields in the current step
             const requiredFields = currentStepElement.querySelectorAll('[required]');
             let isValid = true;
@@ -2550,6 +2666,18 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('certificationModal'));
             modal.hide();
             
+            // Ensure certification flag is set before submission
+            const certificationCheckbox = document.getElementById('certificationAgree');
+            const certificationField = document.getElementById('certificationField');
+            if (certificationCheckbox && certificationField) {
+                if (!certificationCheckbox.checked) {
+                    // Safety guard: should not happen because button is disabled when unchecked
+                    alert('Please agree to the Data Privacy Certification to submit.');
+                    return;
+                }
+                certificationField.value = 'on';
+            }
+
             // Submit the form directly
             const form = document.querySelector('form[method="POST"]');
             if (form) {
@@ -2951,6 +3079,28 @@
         // ===== END OF OCR JAVASCRIPT =====
         
         // Initialize form on page load
+        // Function to validate numeric input
+        function isNumberKey(evt) {
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            // Allow only numbers (0-9)
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }
+        
+        // Function to validate pasted content
+        function validatePaste(evt) {
+            // Get pasted data via clipboard API
+            let clipboardData = evt.clipboardData || window.clipboardData;
+            let pastedData = clipboardData.getData('Text');
+            
+            // Check if pasted data contains only numbers
+            if (!/^\d*$/.test(pastedData)) {
+                return false;
+            }
+            return true;
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             showStep(1);
             
@@ -2965,10 +3115,14 @@
             // Add event listener for certification checkbox
             const certificationCheckbox = document.getElementById('certificationAgree');
             const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+            const certificationField = document.getElementById('certificationField');
             
             if (certificationCheckbox && finalSubmitBtn) {
                 certificationCheckbox.addEventListener('change', function() {
                     finalSubmitBtn.disabled = !this.checked;
+                    if (certificationField) {
+                        certificationField.value = this.checked ? 'on' : '';
+                    }
                 });
             }
             
@@ -3017,7 +3171,151 @@
                     }
                 });
             }
+
+            // ===== Dynamic Family Composition Rows =====
+            const childrenBody = document.getElementById('childrenTableBody');
+            const dependentsBody = document.getElementById('dependentsTableBody');
+            const addChildBtn = document.getElementById('addChildBtn');
+            const addDependentBtn = document.getElementById('addDependentBtn');
+
+            function reindexChildren() {
+                if (!childrenBody) return;
+                const rows = childrenBody.querySelectorAll('tr');
+                rows.forEach((row, idx) => {
+                    const index = idx + 1;
+                    const nameInput = row.querySelector('input[name^="child_name_"]');
+                    const occInput = row.querySelector('input[name^="child_occupation_"]');
+                    const incomeInput = row.querySelector('input[name^="child_income_"]');
+                    const ageInput = row.querySelector('input[name^="child_age_"]');
+                    const workingSelect = row.querySelector('select[name^="child_working_"]');
+                    if (nameInput) nameInput.name = `child_name_${index}`;
+                    if (occInput) occInput.name = `child_occupation_${index}`;
+                    if (incomeInput) incomeInput.name = `child_income_${index}`;
+                    if (ageInput) ageInput.name = `child_age_${index}`;
+                    if (workingSelect) workingSelect.name = `child_working_${index}`;
+                });
+            }
+
+            function reindexDependents() {
+                if (!dependentsBody) return;
+                const rows = dependentsBody.querySelectorAll('tr');
+                rows.forEach((row, idx) => {
+                    const index = idx + 1;
+                    const nameInput = row.querySelector('input[name^="dependent_name_"]');
+                    const occInput = row.querySelector('input[name^="dependent_occupation_"]');
+                    const incomeInput = row.querySelector('input[name^="dependent_income_"]');
+                    const ageInput = row.querySelector('input[name^="dependent_age_"]');
+                    const workingSelect = row.querySelector('select[name^="dependent_working_"]');
+                    if (nameInput) nameInput.name = `dependent_name_${index}`;
+                    if (occInput) occInput.name = `dependent_occupation_${index}`;
+                    if (incomeInput) incomeInput.name = `dependent_income_${index}`;
+                    if (ageInput) ageInput.name = `dependent_age_${index}`;
+                    if (workingSelect) workingSelect.name = `dependent_working_${index}`;
+                });
+            }
+
+            function addChildRow() {
+                if (!childrenBody) return;
+                const nextIndex = childrenBody.querySelectorAll('tr').length + 1;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" name="child_name_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Child Name"></td>
+                    <td><input type="text" name="child_occupation_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Occupation"></td>
+                    <td><input type="text" name="child_income_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Income" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                    <td><input type="text" name="child_age_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Age" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                    <td>
+                      <select name="child_working_${nextIndex}" class="form-select form-select-sm border-0">
+                        <option value="">Is working?</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </td>
+                    <td class="text-center">
+                      <button type="button" class="table-action-delete delete-child-row" title="Delete Row"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                childrenBody.appendChild(tr);
+                reindexChildren();
+            }
+
+            function addDependentRow() {
+                if (!dependentsBody) return;
+                const nextIndex = dependentsBody.querySelectorAll('tr').length + 1;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" name="dependent_name_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Name of Dependent"></td>
+                    <td><input type="text" name="dependent_occupation_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Occupation of Dependent"></td>
+                    <td><input type="text" name="dependent_income_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Income" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                    <td><input type="text" name="dependent_age_${nextIndex}" class="form-control form-control-sm border-0" placeholder="Age" onkeypress="return isNumberKey(event)" onpaste="return validatePaste(event)"></td>
+                    <td>
+                      <select name="dependent_working_${nextIndex}" class="form-select form-select-sm border-0">
+                        <option value="">Is Working?</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </td>
+                    <td class="text-center">
+                      <button type="button" class="table-action-delete delete-dependent-row" title="Delete Row"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                dependentsBody.appendChild(tr);
+                reindexDependents();
+            }
+
+            // Attach add button handlers
+            if (addChildBtn) {
+                addChildBtn.addEventListener('click', addChildRow);
+            }
+            if (addDependentBtn) {
+                addDependentBtn.addEventListener('click', addDependentRow);
+            }
+
+            // Delegate delete buttons
+            if (childrenBody) {
+                childrenBody.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.delete-child-row');
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        row.remove();
+                        reindexChildren();
+                    }
+                });
+            }
+            if (dependentsBody) {
+                dependentsBody.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.delete-dependent-row');
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        row.remove();
+                        reindexDependents();
+                    }
+                });
+            }
+            
+            // Initialize conditional validation for checkup frequency
+            toggleCheckupFrequency();
         });
+        
+        function toggleCheckupFrequency() {
+            const scheduledCheckup = document.getElementById('scheduled_checkup');
+            const checkupFrequency = document.getElementById('checkup_frequency');
+            const requiredIndicator = document.getElementById('checkup_frequency_required');
+            
+            if (scheduledCheckup && checkupFrequency && requiredIndicator) {
+                if (scheduledCheckup.value === 'Yes') {
+                    checkupFrequency.setAttribute('required', 'required');
+                    requiredIndicator.style.display = 'inline';
+                } else {
+                    checkupFrequency.removeAttribute('required');
+                    requiredIndicator.style.display = 'none';
+                    
+                    // If No is selected, clear the frequency field
+                    if (scheduledCheckup.value === 'No') {
+                        checkupFrequency.value = '';
+                    }
+                }
+            }
+        }
     </script>
   </x-header>
 </x-sidebar>

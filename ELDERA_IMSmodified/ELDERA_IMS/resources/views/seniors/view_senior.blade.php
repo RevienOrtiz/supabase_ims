@@ -241,15 +241,61 @@
                           <!-- Right Column: Dependents -->
                           <div class="col-md-6">
                               <div class="info-section-clean mb-4">
-                                  <h6 class="section-title">DEPENDENTS</h6>
+                                  <h6 class="section-title">CHILDREN AND DEPENDENTS</h6>
                                   <div class="info-content">
                                       <div class="info-row">
                                           <span class="info-label">Children:</span>
-                                          <span class="info-value">{{ $senior->children ?? '-----------' }}</span>
+                                          <span class="info-value">
+                                              @php
+                                                  $hc = is_array($senior->household_condition ?? null) ? $senior->household_condition : [];
+                                                  $childrenList = is_array($senior->children) && count($senior->children) > 0 ? $senior->children : ($hc['children'] ?? []);
+                                              @endphp
+                                              @if(is_array($childrenList) && count($childrenList) > 0)
+                                                  @foreach($childrenList as $child)
+                                                      {{ $child['name'] ?? '' }}
+                                                      @php
+                                                          $details = [];
+                                                          if(!empty($child['occupation'])) $details[] = $child['occupation'];
+                                                          if(!empty($child['age'])) $details[] = 'Age: '. $child['age'];
+                                                          if(!empty($child['working'])) $details[] = 'Working: '. $child['working'];
+                                                          if(!empty($child['income'])) $details[] = 'Income: '. $child['income'];
+                                                      @endphp
+                                                      @if(count($details) > 0)
+                                                          ({{ implode(', ', $details) }})
+                                                      @endif
+                                                      @if(!$loop->last), @endif
+                                                  @endforeach
+                                              @else
+                                                  -----------
+                                              @endif
+                                          </span>
                                       </div>
                                       <div class="info-row">
-                                          <span class="info-label">Other Dependent's:</span>
-                                          <span class="info-value">{{ $senior->other_dependents ?? '-----------' }}</span>
+                                          <span class="info-label">Dependents:</span>
+                                          <span class="info-value">
+                                              @php
+                                                  $hc = is_array($senior->household_condition ?? null) ? $senior->household_condition : [];
+$dependentsList = is_array($senior->dependent) && count($senior->dependent) > 0 ? $senior->dependent : ($hc['dependent'] ?? []);
+                                              @endphp
+                                              @if(is_array($dependentsList) && count($dependentsList) > 0)
+                                                  @foreach($dependentsList as $dep)
+                                                      {{ $dep['name'] ?? '' }}
+                                                      @php
+                                                          $details = [];
+                                                          if(!empty($dep['occupation'])) $details[] = $dep['occupation'];
+                                                          if(!empty($dep['age'])) $details[] = 'Age: '. $dep['age'];
+                                                          if(!empty($dep['working'])) $details[] = 'Working: '. $dep['working'];
+                                                          if(!empty($dep['income'])) $details[] = 'Income: '. $dep['income'];
+                                                      @endphp
+                                                      @if(count($details) > 0)
+                                                          ({{ implode(', ', $details) }})
+                                                      @endif
+                                                      @if(!$loop->last), @endif
+                                                  @endforeach
+                                              @else
+                                                  -----------
+                                              @endif
+                                          </span>
                                       </div>
                                   </div>
                               </div>
@@ -327,7 +373,38 @@
                                   <div class="info-content">
                                       <div class="info-row">
                                           <span class="info-label">Household Condition:</span>
-                                          <span class="info-value">{{ is_array($senior->household_condition) ? implode(', ', $senior->household_condition) : ($senior->household_condition ?? '-----------') }}</span>
+                                          <span class="info-value">
+                                              @php
+                                                  $hc = $senior->household_condition ?? null;
+                                                  // Normalize JSON string to array when needed
+                                                  if (is_string($hc)) {
+                                                      $decoded = json_decode($hc, true);
+                                                      if (json_last_error() === JSON_ERROR_NONE) {
+                                                          $hc = $decoded;
+                                                      }
+                                                  }
+                                                  if (is_array($hc)) {
+                                                      $parts = [];
+                                                      foreach ($hc as $key => $val) {
+                                                          // Only show scalar household condition values; children/dependents are shown above
+                                                          if (is_array($val)) {
+                                                              continue;
+                                                          }
+                                                          if (is_string($val)) {
+                                                              $trimmed = trim($val);
+                                                              if ($trimmed !== '') $parts[] = $trimmed;
+                                                          } elseif (is_bool($val)) {
+                                                              $parts[] = $val ? 'Yes' : 'No';
+                                                          } elseif (is_numeric($val)) {
+                                                              $parts[] = (string)$val;
+                                                          }
+                                                      }
+                                                      echo count($parts) ? implode(', ', $parts) : '-----------';
+                                                  } else {
+                                                      echo ($hc !== null && trim((string)$hc) !== '') ? $hc : '-----------';
+                                                  }
+                                              @endphp
+                                          </span>
                                       </div>
                                       <div class="info-row">
                                           <span class="info-label">Support System:</span>

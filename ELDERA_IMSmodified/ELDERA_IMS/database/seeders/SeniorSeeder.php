@@ -15,7 +15,7 @@ class SeniorSeeder extends Seeder
         $barangays = Barangay::all();
         $maritalStatuses = ['Single', 'Married', 'Widowed', 'Separated', 'Others'];
         $genders = ['Male', 'Female'];
-        $religions = ['Roman Catholic', 'Protestant', 'Muslim', 'Buddhist', 'Others'];
+        $religions = ['Roman Catholic', 'Iglesia ni Cristo', 'Evangelical', 'Baptist', 'Methodist', 'Seventh Day Adventist', 'Islam', 'Buddhism', 'Jehovah\'s Witness', 'Born Again Christian', 'Aglipayan', 'None', 'Others'];
         $employments = ['Retired Government Employee', 'Retired Teacher', 'Retired Nurse', 'Retired Engineer', 'Retired', 'Self-employed', 'None'];
 
         for ($i = 0; $i < 100; $i++) {
