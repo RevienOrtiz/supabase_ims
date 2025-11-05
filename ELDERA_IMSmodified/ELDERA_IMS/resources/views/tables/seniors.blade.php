@@ -1362,7 +1362,7 @@
                     if (tabName === 'all-seniors') {
                         document.getElementById('all-seniors-table').style.display = 'block';
                         document.querySelector('[onclick="showTab(\'all-seniors\')"]').classList.add('active');
-                        updateAddButton('Add New Senior', "{{ route('masterprofile') }}");
+                        updateAddButton('Add New Senior', "{{ route('add_new_senior') }}");
                     } else if (tabName === 'benefits-applicants') {
                         document.getElementById('benefits-sub-tabs').style.display = 'flex';
                         document.querySelector('[onclick="showTab(\'benefits-applicants\')"]').classList.add('active');

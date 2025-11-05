@@ -50,6 +50,9 @@ class Senior extends Model
         'spouse_last_name', 'spouse_first_name', 'spouse_middle_name', 'spouse_extension',
         'father_last_name', 'father_first_name', 'father_middle_name', 'father_extension',
         'mother_last_name', 'mother_first_name', 'mother_middle_name', 'mother_extension',
+        // II-A. Children & Dependents
+        'children',
+        'dependent',
         // III. EDUCATION / HR PROFILE
         'education_level', 'skills', 'shared_skills', 'community_activities',
         // IV. DEPENDENCY PROFILE
@@ -85,6 +88,9 @@ class Senior extends Model
         'hearing_condition' => 'array',
         'social_emotional' => 'array',
         'area_difficulty' => 'array',
+        // Family composition arrays
+        'children' => 'array',
+        'dependent' => 'array',
     ];
 
     protected $appends = ['full_name', 'age'];

@@ -78,7 +78,7 @@ class ComprehensiveSeniorSeeder extends Seeder
                 'sex' => $gender,
                 'contact_number' => '09' . rand(100000000, 999999999),
                 'email' => rand(0, 1) ? strtolower($firstName . '.' . $lastName . '@email.com') : null,
-                'religion' => ['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'][array_rand(['Catholic', 'Protestant', 'Islam', 'Buddhism', 'Others'])],
+                'religion' => ['Roman Catholic', 'Iglesia ni Cristo', 'Evangelical', 'Baptist', 'Methodist', 'Seventh Day Adventist', 'Islam', 'Buddhism', 'Jehovah\'s Witness', 'Born Again Christian', 'Aglipayan', 'None', 'Others'][array_rand(['Roman Catholic', 'Iglesia ni Cristo', 'Evangelical', 'Baptist', 'Methodist', 'Seventh Day Adventist', 'Islam', 'Buddhism', 'Jehovah\'s Witness', 'Born Again Christian', 'Aglipayan', 'None', 'Others'])],
                 'ethnic_origin' => 'Filipino',
                 'language' => 'Filipino, English',
                 'gsis_sss' => rand(0, 1) ? rand(1000000000, 9999999999) : null,

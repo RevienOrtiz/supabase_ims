@@ -224,13 +224,9 @@
           <i class="fas fa-th-large"></i> Dashboard
         </a>
       </li>
-      <li class="{{ request()->routeIs('masterprofile') ? 'active' : '' }}">
-        <a href="{{ route('masterprofile') }}"><i class="fas fa-user-plus"></i> Add New Senior</a>
+      <li class="{{ request()->routeIs('add_new_senior') ? 'active' : '' }}">
+        <a href="{{ route('add_new_senior') }}"><i class="fas fa-user-plus"></i> Add New Senior</a>
       </li>
-
-      {{-- <li class="{{ request()->routeIs('add_new_senior') ? 'active' : '' }}">
-        <a href="{{ route('add_new_senior') }}"><i class="fas fa-user-plus"></i> Add New Senior 2</a>
-      </li> --}}
       <li class="{{ request()->routeIs(['seniors', 'view_senior', 'edit_senior', 'seniors.benefits', 'seniors.pension', 'seniors.id-applications']) ? 'active' : '' }}">
         <a href="{{ route('seniors') }}"><i class="fas fa-users"></i> Senior Citizen</a>
       </li>

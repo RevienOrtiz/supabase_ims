@@ -175,29 +175,30 @@ Route::middleware(['auth'])->group(function () {
         }
     });
 
+    // OLD ROUTES - DEPRECATED (Use add_new_senior route instead)
     // for testing purposes only
-    Route::get('/masterprofile/{id}', function ($id) {
-        try {
-            $senior = \App\Models\Senior::findOrFail($id);
-            Log::info('Master profile route called', [
-                'id' => $id,
-                'senior_id' => $senior->id,
-                'senior_name' => $senior->first_name . ' ' . $senior->last_name
-            ]);
-            return view('test.masterprofile', compact('senior'));
-        } catch (\Exception $e) {
-            Log::error('Master profile route error', [
-                'id' => $id,
-                'error' => $e->getMessage()
-            ]);
-            return redirect()->route('seniors')->with('error', 'Senior not found.');
-        }
-    })->name('masterprofile.show');
+    // Route::get('/masterprofile/{id}', function ($id) {
+    //     try {
+    //         $senior = \App\Models\Senior::findOrFail($id);
+    //         Log::info('Master profile route called', [
+    //             'id' => $id,
+    //             'senior_id' => $senior->id,
+    //             'senior_name' => $senior->first_name . ' ' . $senior->last_name
+    //         ]);
+    //         return view('test.masterprofile', compact('senior'));
+    //     } catch (\Exception $e) {
+    //         Log::error('Master profile route error', [
+    //             'id' => $id,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //         return redirect()->route('seniors')->with('error', 'Senior not found.');
+    //     }
+    // })->name('masterprofile.show');
     
     // Default master profile route (shows empty form for adding new senior)
-    Route::get('/masterprofile', function () {
-        return view('test.masterprofile', ['senior' => null]);
-    })->name('masterprofile');
+    // Route::get('/masterprofile', function () {
+    //     return view('test.masterprofile', ['senior' => null]);
+    // })->name('masterprofile');
     
     // Store new senior route
     Route::post('/seniors', [SeniorController::class, 'store'])->name('seniors.store');
