@@ -36,7 +36,7 @@
                     <td>{{ $senior->first_name }} {{ $senior->last_name }}</td>
                     <td>{{ \Carbon\Carbon::parse($senior->date_of_birth)->age }}</td>
                     <td>{{ $senior->sex }}</td>
-                    <td>{{ $senior->barangay }}</td>
+                    <td>{{ implode('-', array_map('ucfirst', explode('-', $senior->barangay))) }}</td>
                     <td>
                         <span class="status-badge status-{{ $senior->status }}">
                             {{ ucfirst($senior->status) }}
