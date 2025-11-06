@@ -246,7 +246,7 @@
           display: flex;
           gap: clamp(8px, 2vw, 12px);
           margin-top: clamp(6px, 1.5vh, 8px);
-          font-size: clamp(10px, 1.5vw, 12px);
+          font-size: clamp(8px, 1.2vw, 10px);
           justify-content: center;
           flex-wrap: wrap;
         }
@@ -256,8 +256,8 @@
           gap: clamp(3px, 0.5vw, 4px);
         }
         .legend-color {
-          width: clamp(12px, 2vw, 14px);
-          height: clamp(12px, 2vw, 14px);
+          width: clamp(8px, 1.5vw, 10px);
+          height: clamp(8px, 1.5vw, 10px);
           border-radius: 3px;
           display: inline-block;
         }
@@ -316,14 +316,22 @@
         .events-table-header {
           background: #f8f9fa;
           border-bottom: 2px solid #dee2e6;
+          position: sticky;
+          top: 0;
+          z-index: 10;
         }
         .events-table-header th {
           background: #f8f9fa;
           position: static;
           z-index: auto;
+          font-weight: 600;
+          color: #495057;
         }
         .events-table tbody tr:hover {
           background: #f8f9fa;
+        }
+        .events-table tbody tr:hover td a {
+          color: #1a5f7a !important;
         }
         .events-table tbody tr:last-child td {
           border-bottom: none;
@@ -333,6 +341,20 @@
           height: 12px;
           border-radius: 3px;
           display: inline-block;
+        }
+        .events-table-body::-webkit-scrollbar {
+          width: 8px;
+        }
+        .events-table-body::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+        .events-table-body::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 4px;
+        }
+        .events-table-body::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
         }
         .event-general { background: #19e36c; }
         .event-health { background: #e33c3c; }
@@ -348,161 +370,6 @@
           align-self: flex-end;
         }
 
-        /* Mini Calendar Styles */
-        .mini-calendar {
-          width: 100%;
-          max-width: 280px;
-          margin: 0 auto;
-          font-size: 12px;
-          height: 100%;
-          max-height: 250px;
-          display: flex;
-          flex-direction: column;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          overflow: hidden;
-        }
-        
-        .calendar-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0;
-          padding: 12px 15px;
-          background: #f8f9fa;
-          border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .calendar-nav {
-          background: #277da1;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          width: 28px;
-          height: 28px;
-          cursor: pointer;
-          font-size: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-        }
-        
-        .calendar-nav:hover {
-          background: #1e6b8c;
-        }
-        
-        .calendar-month-year {
-          font-weight: bold;
-          font-size: 16px;
-          color: #333;
-        }
-        
-        .calendar-weekdays {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 0;
-          margin-bottom: 0;
-          background: #f1f3f4;
-          border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .weekday {
-          text-align: center;
-          font-weight: bold;
-          font-size: 12px;
-          color: #666;
-          padding: 8px 4px;
-          border-right: 1px solid #e0e0e0;
-        }
-        
-        .weekday:last-child {
-          border-right: none;
-        }
-        
-        .calendar-days {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 0;
-          flex: 1;
-          background: white;
-        }
-        
-        .calendar-day {
-          aspect-ratio: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          cursor: pointer;
-          position: relative;
-          background: white;
-          color: #333;
-          min-height: 32px;
-          border-right: 1px solid #e0e0e0;
-          border-bottom: 1px solid #e0e0e0;
-          transition: background-color 0.2s ease;
-        }
-        
-        .calendar-day:nth-child(7n) {
-          border-right: none;
-        }
-        
-        .calendar-day:hover {
-          background: #f5f5f5;
-        }
-        
-        .calendar-day.today {
-          background: #e3f2fd;
-          color: #1976d2;
-          font-weight: bold;
-          border: 2px solid #1976d2;
-        }
-        
-        .calendar-day.other-month {
-          color: #bbb;
-          background: #fafafa;
-        }
-        
-        .calendar-day.has-event {
-          font-weight: bold;
-        }
-        
-        .calendar-day.has-event.today {
-          border: 2px solid #1976d2;
-        }
-        
-        /* Event type specific colors */
-        .calendar-day.event-general {
-          background: #e8f5e8 !important;
-          color: #2e7d32 !important;
-        }
-        
-        .calendar-day.event-health {
-          background: #ffebee !important;
-          color: #c62828 !important;
-        }
-        
-        .calendar-day.event-pension {
-          background: #e3f2fd !important;
-          color: #1565c0 !important;
-        }
-        
-        .calendar-day.event-id {
-          background: #fffde7 !important;
-          color: #f57f17 !important;
-        }
-        
-        .event-indicator {
-          position: absolute;
-          bottom: 2px;
-          right: 2px;
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          border: 1px solid white;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
 
         .charts {
           display: flex;
@@ -810,13 +677,13 @@
             }
             
             .legend {
-                font-size: 10px;
+                font-size: 8px;
                 gap: 4px;
             }
             
             .legend-color {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
             }
             
             .filter-btn {
@@ -906,77 +773,44 @@
                
             </div>
             
-            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                {{-- Three Pie Charts in a Row --}}
-                <div class="charts" style="width: 100%; margin-bottom: 10px;">
-                    <div class="card" style="flex:1;">
-                        <div class="card-header">TOTAL # OF SENIOR CITIZEN</div>
-                        <div class="card-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 200px; height: 120px; margin: 30px auto 30px auto; max-width: 100%; display: flex; align-items: center; justify-content: center;">
-                                <canvas id="genderPieChart" width="120" height="120"></canvas>
-                            </div>
-                            <div class="legend">
-                                <div class="legend-item"><span class="legend-color legend-male"></span>MALE</div>
-                                <div class="legend-item"><span class="legend-color legend-female"></span>FEMALE</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card" style="flex:1;">
-                        <div class="card-header">With Pension</div>
-                        <div class="card-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 200px; height: 120px; margin: 30px auto 30px auto; max-width: 100%; display: flex; align-items: center; justify-content: center;">
-                                <canvas id="pensionPieChart" width="120" height="120"></canvas>
-                            </div>
-                            <div class="legend">
-                                <div class="legend-item"><span class="legend-color legend-pension"></span>WITH PENSION</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card" style="flex:1;">
-                        <div class="card-header">TOTAL EVENTS</div>
-                        <div class="card-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 200px; height: 120px; margin: 30px auto 30px auto; max-width: 100%; display: flex; align-items: center; justify-content: center;">
-                                <canvas id="eventsPieChart" width="120" height="120"></canvas>
-                            </div>
-                            <div class="legend" style="flex-wrap: wrap;">
-                                <div class="legend-item"><span class="legend-color event-general"></span>GENERAL</div>
-                                <div class="legend-item"><span class="legend-color event-pension"></span>PENSION</div>
-                                <div class="legend-item"><span class="legend-color event-health"></span>HEALTH</div>
-                                <div class="legend-item"><span class="legend-color event-id_claiming"></span>ID CLAIMING</div>
-                            </div>
-                        </div>
-                    </div>
-
-                     <div class="card" style="flex:1;">
-                        <div class="card-header">CALENDAR</div>
-                        <div class="card-content">
-                            <div class="mini-calendar" id="miniCalendar">
-                                <div class="calendar-header">
-                                    <button class="calendar-nav" id="prevMonth">&lt;</button>
-                                    <span class="calendar-month-year" id="monthYear"></span>
-                                    <button class="calendar-nav" id="nextMonth">&gt;</button>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start;">
+                {{-- Left Column: Pie Charts and Bar Chart --}}
+                <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 520px;">
+                    {{-- Pie Charts Row --}}
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        {{-- With Pension Chart --}}
+                        <div class="card" style="flex: 1; min-width: 250px; max-width: 300px; height: 300px; display: flex; flex-direction: column;">
+                            <div class="card-header">With Pension</div>
+                            <div class="card-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+                                <div class="legend" style="flex-wrap: nowrap; margin-bottom: 8px; padding-top: 8px; font-size: 7px; gap: 6px;">
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color legend-pension" style="width: 7px; height: 7px;"></span>WITH PENSION</div>
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color legend-nopension" style="width: 7px; height: 7px;"></span>WITHOUT PENSION</div>
                                 </div>
-                                <div class="calendar-weekdays">
-                                    <div class="weekday">S</div>
-                                    <div class="weekday">M</div>
-                                    <div class="weekday">T</div>
-                                    <div class="weekday">W</div>
-                                    <div class="weekday">T</div>
-                                    <div class="weekday">F</div>
-                                    <div class="weekday">S</div>
+                                <div style="width: 220px; height: 180px; margin: 10px auto; max-width: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <canvas id="pensionPieChart" width="180" height="180"></canvas>
                                 </div>
-                                <div class="calendar-days" id="calendarDays">
-                                    <!-- Days will be generated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        {{-- Total Events Chart --}}
+                        <div class="card" style="flex: 1; min-width: 250px; max-width: 300px; height: 300px; display: flex; flex-direction: column;">
+                            <div class="card-header">TOTAL EVENTS</div>
+                            <div class="card-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1;">
+                                <div class="legend" style="flex-wrap: nowrap; margin-bottom: 8px; padding-top: 8px; font-size: 7px; gap: 6px;">
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color event-general" style="width: 7px; height: 7px;"></span>GENERAL</div>
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color event-pension" style="width: 7px; height: 7px;"></span>PENSION</div>
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color event-health" style="width: 7px; height: 7px;"></span>HEALTH</div>
+                                    <div class="legend-item" style="gap: 2px;"><span class="legend-color event-id_claiming" style="width: 7px; height: 7px;"></span>ID CLAIMING</div>
+                                </div>
+                                <div style="width: 220px; height: 180px; margin: 10px auto; max-width: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <canvas id="eventsPieChart" width="180" height="180"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                {{-- Age Bar Chart and Events Table Side by Side --}}
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; width: 100%;">
-                    {{-- Age Bar Chart --}}
-                    <div class="card" style="flex: 1; min-width: 280px;">
+                    
+                    {{-- Age Bar Chart Below Pie Charts --}}
+                    <div class="card" style="width: 100%;">
                         <div class="card-header">Senior Citizen by Age</div>
                         <div class="card-content">
                             <div style="width:100%; height:200px; display:flex; align-items:center; justify-content:center;">
@@ -988,57 +822,72 @@
                             </div>
                         </div>
                     </div>
-                    
-                    {{-- Events Card --}}
-                    <div class="card" style="flex:1; min-width: 280px; height: 300px; display: flex; flex-direction: column;">
-                        <div class="card-header">EVENTS</div>
-                        <div class="events-table-container" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-                            <div class="events-table-header">
-                                <table class="events-table" style="margin-bottom: 0; table-layout: fixed;">
-                                    <colgroup>
-                                        <col style="width: 20px;">
-                                        <col style="width: 40%;">
-                                        <col style="width: 20%;">
-                                        <col style="width: 20%;">
-                                        <col style="width: 20%;">
-                                    </colgroup>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>EVENTS</th>
-                                            <th>DATE</th>
-                                            <th>TIME</th>
-                                            <th>PLACE</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                            <div class="events-table-body" style="flex: 1; overflow-y: auto;">
-                                <table class="events-table" style="table-layout: fixed;">
-                                    <colgroup>
-                                        <col style="width: 20px;">
-                                        <col style="width: 40%;">
-                                        <col style="width: 20%;">
-                                        <col style="width: 20%;">
-                                        <col style="width: 20%;">
-                                    </colgroup>
-                                    <tbody>
-                                        @forelse($events as $event)
-                                        <tr>
-                                            <td style="width: 20px; text-align: center; vertical-align: middle; padding: 8px 4px;"><span class="event-color event-{{ $event->event_type }}"></span></td>
-                                            <td><a href="{{ route('events.show', $event->id) }}" style="color:#277da1; text-decoration:none;">{{ $event->title }}</a></td>
-                                            <td>{{ $event->event_date->format('d/m/y') }}</td>
-                                            <td>{{ $event->start_time->format('g:i A') }}</td>
-                                            <td>{{ $event->location }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5" style="text-align: center; padding: 20px; color: #666;">No upcoming events</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+                </div>
+                
+                {{-- Right Column: Events Card --}}
+                <div class="card" style="flex: 1.5; min-width: 280px; height: 575px; display: flex; flex-direction: column;">
+                    <div class="card-header">EVENTS</div>
+                    <div class="events-table-container" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                        <div class="events-table-header">
+                            <table class="events-table" style="margin-bottom: 0; table-layout: fixed;">
+                                <colgroup>
+                                    <col style="width: 45%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 15%;">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; padding: 12px 12px;">EVENTS</th>
+                                        <th style="text-align: center; padding: 12px 8px;">DATE</th>
+                                        <th style="text-align: center; padding: 12px 8px;">TIME</th>
+                                        <th style="text-align: left; padding: 12px 12px;">PLACE</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="events-table-body" style="flex: 1; overflow-y: auto;">
+                            <table class="events-table" style="table-layout: fixed;">
+                                <colgroup>
+                                    <col style="width: 45%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 20%;">
+                                    <col style="width: 15%;">
+                                </colgroup>
+                                <tbody>
+                                    @forelse($events as $event)
+                                    @php
+                                        $eventColors = [
+                                            'general' => '#19e36c',
+                                            'pension' => '#3c8be3',
+                                            'health' => '#e33c3c',
+                                            'id_claiming' => '#ffd500'
+                                        ];
+                                        $eventColor = $eventColors[$event->event_type] ?? '#277da1';
+                                    @endphp
+                                    <tr style="transition: background-color 0.2s ease;">
+                                        <td style="padding: 12px 12px; vertical-align: middle;">
+                                            <a href="{{ route('events.show', $event->id) }}" style="color: {{ $eventColor }}; text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s ease; display: inline-block;">{{ $event->title }}</a>
+                                        </td>
+                                        <td style="padding: 12px 8px; text-align: center; vertical-align: middle; color: #555; font-size: 13px; font-weight: 500;">
+                                            {{ $event->event_date->format('d/m/y') }}
+                                        </td>
+                                        <td style="padding: 12px 8px; text-align: center; vertical-align: middle; color: #555; font-size: 13px; font-weight: 500;">
+                                            {{ $event->start_time->format('g:i A') }}
+                                        </td>
+                                        <td style="padding: 12px 12px; vertical-align: middle; color: #666; font-size: 13px;">
+                                            {{ $event->location }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 40px 20px; color: #999; font-style: italic; font-size: 14px;">
+                                            No upcoming events
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1057,68 +906,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof Chart === 'undefined') {
     console.error('Chart.js not loaded');
     return;
-  }
-
-  // Gender Pie Chart
-  const genderCanvas = document.getElementById('genderPieChart');
-  if (genderCanvas) {
-    const genderCtx = genderCanvas.getContext('2d');
-    const genderData = [{{ $stats['seniors']['male'] ?? 0 }}, {{ $stats['seniors']['female'] ?? 0 }}]; // Male, Female
-    const genderTotal = genderData.reduce((a, b) => a + b, 0);
-    
-    window.genderPieChart = new Chart(genderCtx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: genderData,
-          backgroundColor: ['#208FF7', '#F72020'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { 
-            display: false 
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const labels = ['Male', 'Female'];
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                return `${labels[context.dataIndex]}: ${context.parsed.toLocaleString()} (${percentage}%)`;
-               
-              }
-            }
-          }
-        }
-      },
-      plugins: [{
-        id: 'centerText',
-        beforeDraw: function(chart) {
-          const width = chart.width;
-          const height = chart.height;
-          const ctx = chart.ctx;
-          
-          ctx.restore();
-          ctx.font = 'bold 16px Arial';
-          ctx.fillStyle = '#333';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          
-          const centerX = width / 2;
-          const centerY = height / 2;
-          
-          // Calculate total from current data
-          const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-          ctx.fillText(total.toLocaleString(), centerX, centerY);
-          
-          ctx.save();
-        }
-      }]
-    });
   }
 
   // Pension Pie Chart
@@ -1140,19 +927,31 @@ document.addEventListener('DOMContentLoaded', function() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          animateRotate: true,
+          animateScale: false,
+          duration: 1000,
+          easing: 'easeOutQuart'
+        },
+        layout: {
+          padding: {
+            top: 30,
+            right: 30,
+            bottom: 30,
+            left: 30
+          }
+        },
         plugins: {
           legend: { 
             display: false 
           },
           tooltip: {
-            callbacks: {
-              label: function(context) {
-                const labels = ['With Pension', 'Without Pension'];
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                return `${labels[context.dataIndex]}: ${context.parsed.toLocaleString()} (${percentage}%)`;
-              }
-            }
+            enabled: false
+          }
+        },
+        elements: {
+          arc: {
+            borderWidth: 0
           }
         }
       },
@@ -1164,7 +963,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const ctx = chart.ctx;
           
           ctx.restore();
-          ctx.font = 'bold 16px Arial';
+          ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
           ctx.fillStyle = '#333';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -1177,6 +976,123 @@ document.addEventListener('DOMContentLoaded', function() {
           ctx.fillText(withPensionCount.toLocaleString(), centerX, centerY);
           
           ctx.save();
+        }
+      }, {
+        id: 'percentageLabels',
+        afterDraw: function(chart) {
+          const ctx = chart.ctx;
+          const chartArea = chart.chartArea;
+          const meta = chart.getDatasetMeta(0);
+          const centerX = (chartArea.left + chartArea.right) / 2;
+          const centerY = (chartArea.top + chartArea.bottom) / 2;
+          const radius = Math.min((chartArea.right - chartArea.left) / 2, (chartArea.bottom - chartArea.top) / 2) * 0.85;
+          
+          // Speech bubble dimensions
+          const bubbleWidth = 45;
+          const bubbleHeight = 22;
+          const borderRadius = 5;
+          const pointerSize = 8;
+          const gap = 30; // Spacing between donut and label (increased)
+          
+          // Calculate outer radius with gap and bubble height
+          const outerRadius = radius + gap + (bubbleHeight / 2);
+          
+          const data = chart.data.datasets[0].data;
+          const total = data.reduce((a, b) => a + b, 0);
+          const colors = chart.data.datasets[0].backgroundColor;
+          
+          let currentAngle = -Math.PI / 2; // Start from top
+          
+          data.forEach((value, index) => {
+            if (value === 0) return;
+            
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+            const sliceAngle = (value / total) * 2 * Math.PI;
+            const midAngle = currentAngle + sliceAngle / 2;
+            
+            // Calculate position for label outside the donut
+            const labelX = centerX + Math.cos(midAngle) * outerRadius;
+            const labelY = centerY + Math.sin(midAngle) * outerRadius;
+            
+            // Calculate pointer position on the donut edge
+            const pointerX = centerX + Math.cos(midAngle) * radius;
+            const pointerY = centerY + Math.sin(midAngle) * radius;
+            
+            // Add spacing gap - arrow should not reach the pie chart
+            const arrowGap = 8; // Gap between arrow tip and pie chart
+            const arrowEndX = centerX + Math.cos(midAngle) * (radius - arrowGap);
+            const arrowEndY = centerY + Math.sin(midAngle) * (radius - arrowGap);
+            
+            ctx.save();
+            
+            // Calculate bubble position (centered on label position)
+            const bubbleX = labelX - bubbleWidth / 2;
+            const bubbleY = labelY - bubbleHeight / 2;
+            
+            // Calculate angle from label center to donut segment
+            const angleToSegment = Math.atan2(pointerY - labelY, pointerX - labelX);
+            
+            // Determine which edge the pointer should connect to based on angle
+            const angleDeg = (angleToSegment * 180) / Math.PI;
+            const normalizedAngle = ((angleDeg + 360) % 360);
+            
+            // Find the closest edge point on the bubble
+            let pointerEdgeX, pointerEdgeY;
+            
+            if (normalizedAngle >= 315 || normalizedAngle < 45) {
+              // Right edge
+              pointerEdgeX = bubbleX + bubbleWidth;
+              pointerEdgeY = labelY;
+            } else if (normalizedAngle >= 45 && normalizedAngle < 135) {
+              // Bottom edge
+              pointerEdgeX = labelX;
+              pointerEdgeY = bubbleY + bubbleHeight;
+            } else if (normalizedAngle >= 135 && normalizedAngle < 225) {
+              // Left edge
+              pointerEdgeX = bubbleX;
+              pointerEdgeY = labelY;
+            } else {
+              // Top edge
+              pointerEdgeX = labelX;
+              pointerEdgeY = bubbleY;
+            }
+            
+            // Draw speech bubble (simple rounded rectangle without pointer)
+            ctx.fillStyle = colors[index];
+            ctx.beginPath();
+            ctx.moveTo(bubbleX + borderRadius, bubbleY);
+            ctx.lineTo(bubbleX + bubbleWidth - borderRadius, bubbleY);
+            ctx.arc(bubbleX + bubbleWidth - borderRadius, bubbleY + borderRadius, borderRadius, -Math.PI / 2, 0);
+            ctx.lineTo(bubbleX + bubbleWidth, bubbleY + bubbleHeight - borderRadius);
+            ctx.arc(bubbleX + bubbleWidth - borderRadius, bubbleY + bubbleHeight - borderRadius, borderRadius, 0, Math.PI / 2);
+            ctx.lineTo(bubbleX + borderRadius, bubbleY + bubbleHeight);
+            ctx.arc(bubbleX + borderRadius, bubbleY + bubbleHeight - borderRadius, borderRadius, Math.PI / 2, Math.PI);
+            ctx.lineTo(bubbleX, bubbleY + borderRadius);
+            ctx.arc(bubbleX + borderRadius, bubbleY + borderRadius, borderRadius, Math.PI, -Math.PI / 2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw separate pointer line from bubble to pie segment (with gap, no arrowhead)
+            ctx.strokeStyle = colors[index];
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(pointerEdgeX, pointerEdgeY);
+            ctx.lineTo(arrowEndX, arrowEndY);
+            ctx.stroke();
+            
+            // Draw percentage text
+            ctx.save();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(percentage + '%', labelX, labelY);
+            ctx.restore();
+            
+            ctx.restore();
+            
+            currentAngle += sliceAngle;
+          });
         }
       }]
     });
@@ -1206,19 +1122,31 @@ document.addEventListener('DOMContentLoaded', function() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          animateRotate: true,
+          animateScale: false,
+          duration: 1000,
+          easing: 'easeOutQuart'
+        },
+        layout: {
+          padding: {
+            top: 30,
+            right: 30,
+            bottom: 30,
+            left: 30
+          }
+        },
         plugins: {
           legend: { 
             display: false 
           },
           tooltip: {
-            callbacks: {
-              label: function(context) {
-                const labels = ['General', 'Pension', 'Health', 'ID Claiming'];
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
-                return `${labels[context.dataIndex]}: ${context.parsed.toLocaleString()} (${percentage}%)`;
-              }
-            }
+            enabled: false
+          }
+        },
+        elements: {
+          arc: {
+            borderWidth: 0
           }
         }
       },
@@ -1230,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const ctx = chart.ctx;
           
           ctx.restore();
-          ctx.font = 'bold 16px Arial';
+          ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
           ctx.fillStyle = '#333';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -1243,6 +1171,123 @@ document.addEventListener('DOMContentLoaded', function() {
           ctx.fillText(total.toLocaleString(), centerX, centerY);
           
           ctx.save();
+        }
+      }, {
+        id: 'percentageLabels',
+        afterDraw: function(chart) {
+          const ctx = chart.ctx;
+          const chartArea = chart.chartArea;
+          const meta = chart.getDatasetMeta(0);
+          const centerX = (chartArea.left + chartArea.right) / 2;
+          const centerY = (chartArea.top + chartArea.bottom) / 2;
+          const radius = Math.min((chartArea.right - chartArea.left) / 2, (chartArea.bottom - chartArea.top) / 2) * 0.85;
+          
+          // Speech bubble dimensions
+          const bubbleWidth = 45;
+          const bubbleHeight = 22;
+          const borderRadius = 5;
+          const pointerSize = 8;
+          const gap = 30; // Spacing between donut and label (increased)
+          
+          // Calculate outer radius with gap and bubble height
+          const outerRadius = radius + gap + (bubbleHeight / 2);
+          
+          const data = chart.data.datasets[0].data;
+          const total = data.reduce((a, b) => a + b, 0);
+          const colors = chart.data.datasets[0].backgroundColor;
+          
+          let currentAngle = -Math.PI / 2; // Start from top
+          
+          data.forEach((value, index) => {
+            if (value === 0) return;
+            
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+            const sliceAngle = (value / total) * 2 * Math.PI;
+            const midAngle = currentAngle + sliceAngle / 2;
+            
+            // Calculate position for label outside the donut
+            const labelX = centerX + Math.cos(midAngle) * outerRadius;
+            const labelY = centerY + Math.sin(midAngle) * outerRadius;
+            
+            // Calculate pointer position on the donut edge
+            const pointerX = centerX + Math.cos(midAngle) * radius;
+            const pointerY = centerY + Math.sin(midAngle) * radius;
+            
+            // Add spacing gap - arrow should not reach the pie chart
+            const arrowGap = 8; // Gap between arrow tip and pie chart
+            const arrowEndX = centerX + Math.cos(midAngle) * (radius - arrowGap);
+            const arrowEndY = centerY + Math.sin(midAngle) * (radius - arrowGap);
+            
+            ctx.save();
+            
+            // Calculate bubble position (centered on label position)
+            const bubbleX = labelX - bubbleWidth / 2;
+            const bubbleY = labelY - bubbleHeight / 2;
+            
+            // Calculate angle from label center to donut segment
+            const angleToSegment = Math.atan2(pointerY - labelY, pointerX - labelX);
+            
+            // Determine which edge the pointer should connect to based on angle
+            const angleDeg = (angleToSegment * 180) / Math.PI;
+            const normalizedAngle = ((angleDeg + 360) % 360);
+            
+            // Find the closest edge point on the bubble
+            let pointerEdgeX, pointerEdgeY;
+            
+            if (normalizedAngle >= 315 || normalizedAngle < 45) {
+              // Right edge
+              pointerEdgeX = bubbleX + bubbleWidth;
+              pointerEdgeY = labelY;
+            } else if (normalizedAngle >= 45 && normalizedAngle < 135) {
+              // Bottom edge
+              pointerEdgeX = labelX;
+              pointerEdgeY = bubbleY + bubbleHeight;
+            } else if (normalizedAngle >= 135 && normalizedAngle < 225) {
+              // Left edge
+              pointerEdgeX = bubbleX;
+              pointerEdgeY = labelY;
+            } else {
+              // Top edge
+              pointerEdgeX = labelX;
+              pointerEdgeY = bubbleY;
+            }
+            
+            // Draw speech bubble (simple rounded rectangle without pointer)
+            ctx.fillStyle = colors[index];
+            ctx.beginPath();
+            ctx.moveTo(bubbleX + borderRadius, bubbleY);
+            ctx.lineTo(bubbleX + bubbleWidth - borderRadius, bubbleY);
+            ctx.arc(bubbleX + bubbleWidth - borderRadius, bubbleY + borderRadius, borderRadius, -Math.PI / 2, 0);
+            ctx.lineTo(bubbleX + bubbleWidth, bubbleY + bubbleHeight - borderRadius);
+            ctx.arc(bubbleX + bubbleWidth - borderRadius, bubbleY + bubbleHeight - borderRadius, borderRadius, 0, Math.PI / 2);
+            ctx.lineTo(bubbleX + borderRadius, bubbleY + bubbleHeight);
+            ctx.arc(bubbleX + borderRadius, bubbleY + bubbleHeight - borderRadius, borderRadius, Math.PI / 2, Math.PI);
+            ctx.lineTo(bubbleX, bubbleY + borderRadius);
+            ctx.arc(bubbleX + borderRadius, bubbleY + borderRadius, borderRadius, Math.PI, -Math.PI / 2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw separate pointer line from bubble to pie segment (with gap, no arrowhead)
+            ctx.strokeStyle = colors[index];
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(pointerEdgeX, pointerEdgeY);
+            ctx.lineTo(arrowEndX, arrowEndY);
+            ctx.stroke();
+            
+            // Draw percentage text
+            ctx.save();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(percentage + '%', labelX, labelY);
+            ctx.restore();
+            
+            ctx.restore();
+            
+            currentAngle += sliceAngle;
+          });
         }
       }]
     });
@@ -1322,155 +1367,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
-  // Mini Calendar
-  initializeMiniCalendar();
 });
-
-// Mini Calendar Functions
-function initializeMiniCalendar() {
-  const eventsData = @json($events ?? []);
-  let currentDate = new Date();
-  
-  function renderCalendar(date) {
-    const monthYear = document.getElementById('monthYear');
-    const calendarDays = document.getElementById('calendarDays');
-    
-    if (!monthYear || !calendarDays) return;
-    
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    
-    // Set month/year header
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    monthYear.textContent = `${monthNames[month]} ${year}`;
-    
-    // Clear previous days
-    calendarDays.innerHTML = '';
-    
-    // Get first day of month and number of days
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-    
-    // Add empty cells for days before month starts
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      const emptyDay = document.createElement('div');
-      emptyDay.className = 'calendar-day other-month';
-      const prevMonthDay = new Date(year, month, 0 - (startingDayOfWeek - 1 - i));
-      emptyDay.textContent = prevMonthDay.getDate();
-      calendarDays.appendChild(emptyDay);
-    }
-    
-    // Add days of current month
-    const today = new Date();
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayElement = document.createElement('div');
-      dayElement.className = 'calendar-day';
-      dayElement.textContent = day;
-      
-      // Check if it's today
-      if (year === today.getFullYear() && 
-          month === today.getMonth() && 
-          day === today.getDate()) {
-        dayElement.classList.add('today');
-      }
-      
-      // Check if there are events on this day
-      const dayDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayEvents = eventsData.filter(event => {
-        const eventDate = new Date(event.event_date).toISOString().split('T')[0];
-        return eventDate === dayDate;
-      });
-      
-      if (dayEvents.length > 0) {
-        dayElement.classList.add('has-event');
-        
-        // Get the primary event type for CSS class
-        const primaryEventType = dayEvents[0].event_type;
-        
-        // Add specific event type class for styling
-        switch(primaryEventType) {
-          case 'general':
-            dayElement.classList.add('event-general');
-            break;
-          case 'health':
-            dayElement.classList.add('event-health');
-            break;
-          case 'pension':
-            dayElement.classList.add('event-pension');
-            break;
-          case 'id_claiming':
-            dayElement.classList.add('event-id');
-            break;
-          default:
-            dayElement.classList.add('event-general');
-        }
-        
-        // Create small indicators for multiple event types
-        if (dayEvents.length > 1) {
-          const eventTypes = [...new Set(dayEvents.map(event => event.event_type))];
-          eventTypes.slice(1).forEach((eventType, index) => {
-            const indicator = document.createElement('div');
-            indicator.className = 'event-indicator';
-            
-            // Set color based on event type
-            let color = '#4caf50'; // default green
-            switch(eventType) {
-              case 'general':
-                color = '#4caf50'; // green
-                break;
-              case 'health':
-                color = '#f44336'; // red
-                break;
-              case 'pension':
-                color = '#2196f3'; // blue
-                break;
-              case 'id_claiming':
-                color = '#ffc107'; // yellow
-                break;
-              default:
-                color = '#4caf50'; // default green
-            }
-            
-            indicator.style.backgroundColor = color;
-            indicator.style.right = `${2 + (index * 8)}px`;
-            
-            dayElement.appendChild(indicator);
-          });
-        }
-      }
-      
-      calendarDays.appendChild(dayElement);
-    }
-    
-    // Add remaining cells to complete the grid
-    const totalCells = calendarDays.children.length;
-    const remainingCells = 42 - totalCells; // 6 rows × 7 days
-    for (let i = 1; i <= remainingCells && i <= 14; i++) {
-      const nextMonthDay = document.createElement('div');
-      nextMonthDay.className = 'calendar-day other-month';
-      nextMonthDay.textContent = i;
-      calendarDays.appendChild(nextMonthDay);
-    }
-  }
-  
-  // Navigation event listeners
-  document.getElementById('prevMonth')?.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar(currentDate);
-  });
-  
-  document.getElementById('nextMonth')?.addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar(currentDate);
-  });
-  
-  // Initial render
-  renderCalendar(currentDate);
-}
 
 // Barangay filtering function
 function filterByBarangay(selectedBarangay = null) {
@@ -1614,24 +1511,6 @@ function updateDashboardStats(data) {
         console.log('Stats cards updated successfully');
     } else {
         console.error('Not enough stat cards found. Expected 4, found:', statCards.length);
-    }
-    
-    // Update gender pie chart
-    if (window.genderPieChart) {
-        const newGenderData = [parseInt(data.seniors?.male) || 0, parseInt(data.seniors?.female) || 0];
-        const newGenderTotal = newGenderData.reduce((a, b) => a + b, 0);
-        
-        console.log('Updating gender chart with data:', newGenderData);
-        console.log('Gender chart total:', newGenderTotal);
-        console.log('Current chart data before update:', window.genderPieChart.data.datasets[0].data);
-        
-        window.genderPieChart.data.datasets[0].data = newGenderData;
-        window.genderPieChart.update();
-        
-        console.log('Current chart data after update:', window.genderPieChart.data.datasets[0].data);
-        console.log('Gender pie chart updated with total:', newGenderTotal);
-    } else {
-        console.warn('Gender pie chart not found');
     }
     
     // Update pension pie chart

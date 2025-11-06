@@ -623,8 +623,23 @@
         });
 
         function loadAllSeniors() {
-            // Load seniors data from PHP with properly formatted dates
-            const seniorsData = {!! json_encode(\App\Models\Senior::orderBy('last_name')->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'middle_name', 'osca_id', 'barangay', 'sex', 'date_of_birth', 'birth_place', 'marital_status', 'contact_number', 'monthly_income', 'status'])) !!};
+            // Load only essential data for form auto-fill (SECURITY: No sensitive data exposure)
+            const seniorsData = {!! json_encode(\App\Models\Senior::orderBy('last_name')->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'middle_name', 'osca_id', 'barangay', 'sex', 'date_of_birth', 'birth_place', 'marital_status', 'monthly_income', 'status'])->map(function($senior) {
+                return [
+                    'id' => $senior->id,
+                    'first_name' => $senior->first_name,
+                    'last_name' => $senior->last_name,
+                    'middle_name' => $senior->middle_name,
+                    'osca_id' => $senior->osca_id,
+                    'barangay' => $senior->barangay,
+                    'sex' => $senior->sex,
+                    'date_of_birth' => $senior->date_of_birth,
+                    'birth_place' => $senior->birth_place,
+                    'marital_status' => $senior->marital_status,
+                    'monthly_income' => $senior->monthly_income,
+                    'status' => $senior->status
+                ];
+            })) !!};
             
             // Format dates for HTML date input and add status indicator
             allSeniors = seniorsData.map(senior => ({

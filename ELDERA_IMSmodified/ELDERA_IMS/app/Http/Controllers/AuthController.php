@@ -20,7 +20,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
@@ -30,9 +30,9 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        // Try to authenticate using email as username
+        // Authenticate using email
         $credentials = [
-            'email' => $request->username,
+            'email' => $request->email,
             'password' => $request->password
         ];
 
@@ -56,8 +56,8 @@ class AuthController extends Controller
             }
         }
 
-        // If email doesn't work, try using username field if it exists
-        $user = User::where('email', $request->username)->first();
+        // Fallback: Check if user exists with email and verify password
+        $user = User::where('email', $request->email)->first();
         
         if ($user && Hash::check($request->password, $user->password)) {
             // Generate 6-digit code and send email
@@ -75,7 +75,7 @@ class AuthController extends Controller
         }
 
         return redirect()->back()
-            ->withErrors(['username' => 'Invalid credentials. Please check your username and password.'])
+            ->withErrors(['email' => 'Invalid credentials. Please check your email and password.'])
             ->withInput();
     }
 

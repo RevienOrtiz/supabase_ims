@@ -267,10 +267,10 @@
                 @endif
                 
                 <div class="mb-3">
-                    <label class="form-label">USERNAME:</label>
+                    <label class="form-label">EMAIL:</label>
                     <div class="input-group">
-                        <span class="input-group-text" style="background-color: #e31575; color: white;"><i class="fas fa-user"></i></span>
-                        <input type="text" class="form-input" name="username" placeholder="USERNAME" value="{{ old('username') }}" required>
+                        <span class="input-group-text" style="background-color: #e31575; color: white;"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-input" name="email" placeholder="EMAIL" value="{{ old('email') }}" required>
                     </div>
                 </div>
 

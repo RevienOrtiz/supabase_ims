@@ -614,46 +614,31 @@ function validateForm() {
         }
     }
     
-    // Log all form fields and their values
-    console.log('Logging all form fields:');
-    const formData = new FormData(form);
-    for (let pair of formData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-    }
+    // SECURITY: Removed sensitive data logging
     
     // BYPASS VALIDATION: Directly submit the form if civil status is set
     if (civilStatus && civilStatus.value) {
-        console.log('Civil status is set, bypassing validation and submitting form');
         confirmSubmit();
         return true;
     }
     
     // Check for empty required fields
     const requiredFields = form.querySelectorAll('[required]');
-    console.log('Required fields count:', requiredFields.length);
     let emptyRequiredFields = [];
     requiredFields.forEach(field => {
         if (!field.value) {
             emptyRequiredFields.push(field.name || field.id);
-            console.log('Empty required field:', field.name || field.id);
         }
     });
-    
-    if (emptyRequiredFields.length > 0) {
-        console.log('Empty required fields:', emptyRequiredFields);
-    }
     
     // Ensure all auto-filled fields are properly included
     ensureAutoFilledValues();
     
     // Check form validity
-    console.log('Form validity:', form.checkValidity());
     if (form.checkValidity()) {
-        console.log('Form is valid, proceeding to submission');
         confirmSubmit();
     } else {
         // Trigger browser's native form validation
-        console.log('Form is invalid, showing validation errors');
         form.reportValidity();
     }
 }
@@ -1381,8 +1366,7 @@ function submitFormWithAjax() {
                     checkbox.checked = false;
                 });
                 
-                // Debug the entire senior object
-                console.log('Full senior data:', senior);
+                // SECURITY: Removed sensitive data logging
                 
                 // IMPORTANT: The issue is with the checkbox values
                 // The form has checkboxes with these values:
@@ -1395,13 +1379,10 @@ function submitFormWithAjax() {
                 let shouldCheckLivingWith = false;
                 
                 if (senior.living_with) {
-                    console.log('Senior has living_with data:', senior.living_with);
-                    
                     // Handle JSON string format
                     if (typeof senior.living_with === 'string' && senior.living_with.includes('[')) {
                         try {
                             const livingWithArray = JSON.parse(senior.living_with);
-                            console.log('Parsed living_with JSON:', livingWithArray);
                             
                             if (Array.isArray(livingWithArray) && 
                                 (livingWithArray.includes('Children') || 

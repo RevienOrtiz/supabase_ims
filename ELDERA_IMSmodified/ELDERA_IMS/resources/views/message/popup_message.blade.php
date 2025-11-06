@@ -45,6 +45,20 @@
     </div>
 </div>
 
+<!-- ⚠️ Validation Error Popup -->
+<div id="validationErrorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-icon" style="background: #dc3545;">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h2 class="modal-title" id="validationErrorTitle" style="color: #dc3545;">Validation Error</h2>
+        <p class="modal-message" id="validationErrorMessage">Please fix the following errors:</p>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-confirm" onclick="hideValidationErrorModal()" style="background: #dc3545;">OK</button>
+        </div>
+    </div>
+</div>
+
 <style>
     /* Success Card Styles */
     .success-card {
@@ -624,5 +638,27 @@
     // Function to handle the actual form submission (legacy support)
     function submitForm() {
         confirmAction();
+    }
+
+    // Function to show validation error modal
+    function showValidationErrorModal(title, message) {
+        const titleElement = document.getElementById('validationErrorTitle');
+        const messageElement = document.getElementById('validationErrorMessage');
+        
+        if (titleElement) titleElement.innerText = title;
+        if (messageElement) messageElement.innerText = message;
+        
+        const modalElement = document.getElementById('validationErrorModal');
+        if (modalElement) {
+            modalElement.style.display = 'flex';
+        }
+    }
+
+    // Function to hide validation error modal
+    function hideValidationErrorModal() {
+        const modalElement = document.getElementById('validationErrorModal');
+        if (modalElement) {
+            modalElement.style.display = 'none';
+        }
     }
 </script>

@@ -207,6 +207,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/add-new-senior', function () {
         return view('seniors.add_new_senior');
     })->name('add_new_senior');
+    
+    // SECURITY: Secure photo serving route
+    Route::get('/seniors/{id}/photo', [SeniorController::class, 'servePhoto'])->name('seniors.photo');
 });
 
 // OCR Processing Route

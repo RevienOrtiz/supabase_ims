@@ -31,11 +31,9 @@ class SeniorAuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        Log::info('Direct login attempt for OSCA ID: "' . $request->osca_id . '"');
+        Log::info('Direct login attempt for OSCA ID: [REDACTED]');
         
-        // Debug all app_users with similar OSCA IDs to help diagnose the issue
-        $similarUsers = AppUser::where('osca_id', 'like', '%' . substr($request->osca_id, -3) . '%')->get();
-        Log::info('Similar OSCA IDs in database: ' . json_encode($similarUsers->pluck('osca_id')));
+        // SECURITY: Don't log sensitive data or expose user information
         
         // CRITICAL FIX: Make OSCA ID lookup more flexible
         // Try multiple formats to find the user (with/without hyphen, case insensitive)
@@ -43,11 +41,7 @@ class SeniorAuthController extends Controller
         $oscaIdWithoutHyphen = str_replace('-', '', $oscaId);
         $oscaIdWithHyphen = substr($oscaIdWithoutHyphen, 0, 4) . '-' . substr($oscaIdWithoutHyphen, 4);
         
-        Log::info('Trying multiple OSCA ID formats', [
-            'original' => $oscaId,
-            'without_hyphen' => $oscaIdWithoutHyphen,
-            'with_hyphen' => $oscaIdWithHyphen
-        ]);
+        // SECURITY: Don't log sensitive OSCA ID formats
         
         // Try all possible formats
         $appUser = AppUser::where('osca_id', $oscaId)
@@ -56,7 +50,7 @@ class SeniorAuthController extends Controller
             ->first();
         
         if (!$appUser) {
-            Log::info('App user not found for OSCA ID: ' . $request->osca_id);
+            Log::info('App user not found for OSCA ID: [REDACTED]');
             return response()->json([
                 'success' => false,
                 'message' => 'User not found'
@@ -265,19 +259,16 @@ class SeniorAuthController extends Controller
                         'date_of_birth' => $senior->date_of_birth,
                         'age' => $senior->age,
                         'sex' => $senior->sex,
-                        'contact_number' => $senior->contact_number,
                         'email' => $user->email,
                         'address' => [
                             'region' => $senior->region,
                             'province' => $senior->province,
                             'city' => $senior->city,
                             'barangay' => $senior->barangay,
-                            'residence' => $senior->residence,
-                            'street' => $senior->street,
                         ],
                         'has_pension' => $senior->has_pension,
                         'status' => $senior->status,
-                        'photo_path' => $senior->photo_path,
+                        'photo_path' => $senior->photo_path ? route('seniors.photo', $senior->id) : null,
                     ]
                 ]);
             }
