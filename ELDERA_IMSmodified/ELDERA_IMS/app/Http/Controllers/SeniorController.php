@@ -625,7 +625,7 @@ class SeniorController extends Controller
             'other_govt_id' => 'nullable|string|max:50',
             'can_travel' => 'nullable|string|in:Yes,No',
             'employment' => 'nullable|string|max:255',
-            'has_pension' => 'nullable|string|in:Yes,No',
+            'has_pension' => 'nullable|string|in:1,0',
             'status' => 'required|string|in:active,deceased',
             // II. FAMILY COMPOSITION
             'spouse_last_name' => 'nullable|string|max:255',
@@ -674,7 +674,7 @@ class SeniorController extends Controller
 
         // Convert boolean fields properly
         $validatedData['can_travel'] = $request->input('can_travel') === 'Yes' ? true : false;
-        $validatedData['has_pension'] = $request->input('has_pension') === 'Yes' ? true : false;
+        $validatedData['has_pension'] = $request->input('has_pension') === '1' ? true : false;
         $validatedData['certification'] = $request->input('certification') === 'on' ? true : false;
 
         // Provide safe defaults for non-nullable DB columns when fields are omitted
