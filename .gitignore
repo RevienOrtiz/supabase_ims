@@ -1,0 +1,11 @@
+web/node_modules/
+web/.next/
+web/.vercel/
+web/.turbo/
+eldera/.dart_tool/
+eldera/build/
+eldera/ios/Pods/
+eldera/android/.gradle/
+.vscode/
+.idea/
+*.log
