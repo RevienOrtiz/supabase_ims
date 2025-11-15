@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: eldera-ims
+    env: docker
+    rootDirectory: ELDERA_IMSmodified/ELDERA_IMS
+    dockerfilePath: ELDERA_IMSmodified/ELDERA_IMS/Dockerfile
+    autoDeploy: true
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      # Set APP_KEY, DB_* and other secrets in Render dashboard after creation
