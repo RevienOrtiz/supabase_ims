@@ -23,6 +23,9 @@ export default async function Page() {
   return (
     <main style={{ padding: 24, fontFamily: 'system-ui, sans-serif' }}>
       <h1>Supabase Eldera Announcements</h1>
+      <p style={{ marginTop: 8 }}>
+        <a href="/ims" style={{ color: '#2563eb', textDecoration: 'underline' }}>Open IMS</a>
+      </p>
       {announcements.length === 0 && <p>No announcements.</p>}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {announcements.map((a: any) => (

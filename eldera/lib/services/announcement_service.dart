@@ -1,38 +1,27 @@
 import '../models/announcement.dart';
 import '../utils/secure_logger.dart';
 import 'api_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Announcement service for the Eldera app
 class AnnouncementService {
   /// Get all announcements
   static Future<List<Announcement>> getAllAnnouncements() async {
     try {
-      // Primary: fetch announcements from Supabase
-      final client = Supabase.instance.client;
-      final result = await client
-          .from('announcements')
-          .select()
-          .order('posted_date', ascending: false);
-
-      if (result is List) {
-        final items = result
-            .map((e) => Announcement.fromJson(
-                Map<String, dynamic>.from(e as Map<String, dynamic>)))
-            .toList();
-        SecureLogger.info('Announcements fetched from Supabase: count=${items.length}');
-        return items;
-      }
-
-      // Fallback: fetch via Laravel API if Supabase returns non-list or fails
+      // Fetch announcements from localhost API
       final response = await ApiService.get('announcements');
+
       if (response['success'] == true && response['data'] != null) {
         final List<dynamic> announcementsJson = response['data'];
+        SecureLogger.info(
+            'Announcements fetched: count=${announcementsJson.length}');
+        if (announcementsJson.isNotEmpty) {
+          SecureLogger.debug(
+              'Sample announcement JSON: ${announcementsJson.first}');
+        }
         final items = announcementsJson
-            .map((json) => Announcement.fromJson(
-                Map<String, dynamic>.from(json as Map)))
+            .map((json) => Announcement.fromJson(json))
             .toList();
-        SecureLogger.info('Announcements fetched via API fallback: count=${items.length}');
+        SecureLogger.info('Announcements mapped: count=${items.length}');
         return items;
       }
 
@@ -47,24 +36,6 @@ class AnnouncementService {
   static Future<List<Announcement>> getAnnouncementsByCategory(
       String category) async {
     try {
-      // Prefer server-side filtering when possible
-      try {
-        final client = Supabase.instance.client;
-        final result = await client
-            .from('announcements')
-            .select()
-            .eq('category', category)
-            .order('posted_date', ascending: false);
-        if (result is List) {
-          return result
-              .map((e) => Announcement.fromJson(
-                  Map<String, dynamic>.from(e as Map<String, dynamic>)))
-              .toList();
-        }
-      } catch (_) {
-        // Ignore and fallback to client-side filtering
-      }
-
       final allAnnouncements = await getAllAnnouncements();
       return allAnnouncements.where((a) => a.category == category).toList();
     } catch (e) {
@@ -77,24 +48,6 @@ class AnnouncementService {
   static Future<List<Announcement>> getAnnouncementsByDepartment(
       String department) async {
     try {
-      // Prefer server-side filtering when possible
-      try {
-        final client = Supabase.instance.client;
-        final result = await client
-            .from('announcements')
-            .select()
-            .ilike('department', department)
-            .order('posted_date', ascending: false);
-        if (result is List) {
-          return result
-              .map((e) => Announcement.fromJson(
-                  Map<String, dynamic>.from(e as Map<String, dynamic>)))
-              .toList();
-        }
-      } catch (_) {
-        // Ignore and fallback to client-side filtering
-      }
-
       final allAnnouncements = await getAllAnnouncements();
       return allAnnouncements.where((a) => a.department == department).toList();
     } catch (e) {

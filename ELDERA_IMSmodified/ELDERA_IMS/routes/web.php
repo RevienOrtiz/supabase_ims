@@ -7,7 +7,7 @@ use App\Http\Controllers\SeniorController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
-    return view('index');
+    return redirect()->route('login');
 });
 
 // Authentication Routes

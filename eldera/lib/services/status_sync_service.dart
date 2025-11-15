@@ -93,14 +93,13 @@ class StatusSyncService {
 
     // Reminder status updates
     SupabaseRealtimeService.reminderStream.listen(
-      (reminderData) => _handleReminderStatusUpdate(reminderData.toJson()),
+      (reminderData) => _handleReminderStatusUpdate(reminderData),
       onError: (error) => _handleSyncError('reminder_update', error),
     );
 
     // Notification status updates
     SupabaseRealtimeService.notificationStream.listen(
-      (notificationData) =>
-          _handleNotificationStatusUpdate(notificationData.toJson()),
+      (notificationData) => _handleNotificationStatusUpdate(notificationData),
       onError: (error) => _handleSyncError('notification_update', error),
     );
   }
@@ -192,8 +191,7 @@ class StatusSyncService {
 
       switch (webhookType) {
         case 'user_profile_update':
-          result = await IMSWebhookHandler.handleUserProfileUpdate(
-              payload, 'mock_signature');
+          result = await IMSWebhookHandler.handleUserProfileUpdate(payload);
           break;
         case 'announcement_update':
           result = await IMSWebhookHandler.handleAnnouncementUpdate(payload);
@@ -379,58 +377,22 @@ class StatusSyncService {
 
   /// Force sync users from IMS API
   Future<void> forceUserSync() async {
-    await _forceSyncUsers();
+    // Implementation pending IMS API integration
   }
 
   /// Force sync announcements from IMS API
   Future<void> forceAnnouncementSync() async {
-    await _forceSyncAnnouncements();
+    // Implementation pending IMS API integration
   }
 
   /// Force sync reminders from IMS API
   Future<void> forceReminderSync() async {
-    await _forceSyncReminders();
+    // Implementation pending IMS API integration
   }
 
   /// Force sync notifications from IMS API
   Future<void> forceNotificationSync() async {
-    await _forceSyncNotifications();
-  }
-
-  Future<bool> _forceSyncUsers() async {
-    try {
-      _updateLastSyncTime('users');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<bool> _forceSyncAnnouncements() async {
-    try {
-      _updateLastSyncTime('announcements');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<bool> _forceSyncReminders() async {
-    try {
-      _updateLastSyncTime('reminders');
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<bool> _forceSyncNotifications() async {
-    try {
-      _updateLastSyncTime('notifications');
-      return true;
-    } catch (_) {
-      return false;
-    }
+    // Implementation pending IMS API integration
   }
 
   /// Dispose of the service
