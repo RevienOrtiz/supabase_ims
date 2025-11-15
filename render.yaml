@@ -2,8 +2,8 @@ services:
   - type: web
     name: eldera-ims
     env: docker
-    rootDirectory: ELDERA_IMSmodified/ELDERA_IMS
     dockerfilePath: ELDERA_IMSmodified/ELDERA_IMS/Dockerfile
+    dockerContext: ELDERA_IMSmodified/ELDERA_IMS
     autoDeploy: true
     plan: free
     envVars:
