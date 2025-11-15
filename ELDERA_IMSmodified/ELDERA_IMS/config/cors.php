@@ -25,7 +25,7 @@ return [
         'http://localhost:8080', // Vue development
         'http://127.0.0.1:3000',
         'http://127.0.0.1:8080',
-        'http://192.168.18.182:8000', // Laravel server IP
+        'http://192.168.1.115:8000', // Laravel server IP
         // Add your production Flutter app domain here
         // 'https://your-flutter-app.com',
     ],

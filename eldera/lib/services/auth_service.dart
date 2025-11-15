@@ -8,6 +8,7 @@ import '../services/local_database_service.dart';
 import '../services/optimized_api_service.dart';
 import '../config/environment_config.dart';
 import 'api_service.dart';
+import 'user_service.dart';
 
 /// Authentication service for the Eldera app
 class AuthService {
@@ -171,16 +172,21 @@ class AuthService {
             age = int.tryParse(profileData['age'].toString()) ?? 0;
           }
 
-          // Compose human-readable address
           final addressObj = profileData['address'] ?? {};
-          final street = addressObj['street'] ?? '';
-          final barangay = addressObj['barangay'] ?? '';
-          final city = addressObj['city'] ?? '';
-          final province = addressObj['province'] ?? '';
-          final List<String> addressParts = [street, barangay, city, province]
-              .where((p) => p != null && p.toString().trim().isNotEmpty)
-              .map((p) => p.toString().trim())
-              .toList();
+          final street = addressObj['street']?.toString() ?? '';
+          final residence = addressObj['residence']?.toString() ?? '';
+          final barangay = addressObj['barangay']?.toString() ?? '';
+          final city = addressObj['city']?.toString() ?? '';
+          final province = addressObj['province']?.toString() ?? '';
+          final region = addressObj['region']?.toString() ?? '';
+          final List<String> addressParts = [
+            street,
+            residence,
+            barangay,
+            city,
+            province,
+            region
+          ].where((p) => p.trim().isNotEmpty).toList();
 
           // Normalize pension flag and status
           final hasPensionRaw = profileData['has_pension'];
@@ -190,10 +196,11 @@ class AuthService {
           final String idStatus =
               profileData['status']?.toString() ?? 'Senior Citizen';
 
-          // Update current user with complete profile data
+          final userId = profileData['id']?.toString() ?? (_currentUser?.id ?? '');
+          final name = profileData['name']?.toString() ?? (_currentUser?.name ?? '');
           _currentUser = app_user.User(
-            id: _currentUser!.id,
-            name: profileData['name'] ?? (_currentUser?.name ?? ''),
+            id: userId,
+            name: name,
             age: age,
             phoneNumber: profileData['contact_number']?.toString() ?? '',
             idStatus: idStatus,
@@ -261,13 +268,28 @@ class AuthService {
 
   /// Get the current authenticated user
   static Future<app_user.User?> getCurrentUser() async {
-    if (_currentUser == null) {
-      final token = await SecureStorageService.getAuthToken();
-      if (token != null) {
-        _isAuthenticated = true;
-        // Set token in ApiService before fetching profile
-        ApiService.setAuthToken(token);
+    final token = await SecureStorageService.getAuthToken();
+    if (token != null) {
+      _isAuthenticated = true;
+      ApiService.setAuthToken(token);
+
+      final needsProfile = _currentUser == null ||
+          _currentUser!.age == 0 ||
+          (_currentUser!.address == null || _currentUser!.address!.isEmpty) ||
+          (_currentUser!.birthDate == null || _currentUser!.birthDate!.isEmpty) ||
+          (_currentUser!.phoneNumber.isEmpty);
+
+      if (needsProfile) {
         await _fetchUserProfile();
+      }
+
+      if (_currentUser == null ||
+          _currentUser!.age == 0 ||
+          (_currentUser!.address == null || _currentUser!.address!.isEmpty)) {
+        final fallback = await UserService.getCurrentUser();
+        if (fallback != null) {
+          _currentUser = fallback;
+        }
       }
     }
     return _currentUser;

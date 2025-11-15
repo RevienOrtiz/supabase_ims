@@ -14,10 +14,15 @@ class ComprehensiveSeniorSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing seniors (handle foreign key constraints)
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Senior::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // Clear existing seniors (handle foreign key constraints) for current driver
+        $driver = DB::getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            Senior::truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } else {
+            DB::statement('TRUNCATE TABLE seniors RESTART IDENTITY CASCADE');
+        }
 
         // Sample data arrays
         $firstNames = [

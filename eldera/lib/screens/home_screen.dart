@@ -95,6 +95,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
+  }
+
   Future<void> _initializeGeminiTts() async {
     try {
       geminiTts = GeminiTtsService();
@@ -587,8 +603,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Stack(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: _getSafeScaledIconSize(baseSize: 32.0),
+                    height: _getSafeScaledIconSize(baseSize: 32.0),
                     decoration: BoxDecoration(
                       color: categoryColor
                           .withOpacity(1.0)
@@ -604,7 +620,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Icon(
                         Announcement.getIconData(announcement.iconType),
                         color: Colors.white,
-                        size: 18,
+                        size: _getSafeScaledIconSize(baseSize: 18.0),
                       ),
                     ),
                   ),
@@ -737,7 +753,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icon(
                           Icons.play_arrow,
                           color: Colors.white,
-                          size: 16,
+                          size: _getSafeScaledIconSize(baseSize: 16.0),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -896,7 +912,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(
                 Icons.check_circle,
                 color: Colors.green,
-                size: 14,
+                size: 14, // Fixed size that won't scale with font
               ),
               const SizedBox(width: 4),
               Flexible(
@@ -974,10 +990,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down,
                 color: Colors.black87,
-                size: 18,
+                size: _getSafeScaledIconSize(baseSize: 18.0),
               ),
             ],
           ),
@@ -996,7 +1012,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.schedule, color: Colors.blue),
+                leading: Icon(Icons.schedule, color: Colors.blue, size: _getSafeScaledIconSize()),
                 title: Text(_getSafeText('one_hour_before')),
                 onTap: () async {
                   Navigator.of(context).pop();
@@ -1004,7 +1020,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.today, color: Colors.green),
+                leading: Icon(Icons.today, color: Colors.green, size: _getSafeScaledIconSize()),
                 title: Text(_getSafeText('one_day_before')),
                 onTap: () async {
                   Navigator.of(context).pop();
@@ -1012,7 +1028,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.date_range, color: Colors.orange),
+                leading: Icon(Icons.date_range, color: Colors.orange, size: _getSafeScaledIconSize()),
                 title: Text(_getSafeText('custom_time')),
                 onTap: () async {
                   Navigator.of(context).pop();

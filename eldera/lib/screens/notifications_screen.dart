@@ -187,6 +187,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return scaledSize < 14.0 ? 14.0 : scaledSize;
   }
 
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
+  }
+
   Future<void> _loadAnnouncements() async {
     try {
       setState(() {
@@ -439,9 +455,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
-              size: 64,
+              size: _getSafeScaledIconSize(baseSize: 64.0),
               color: Color(0xFF2E8B8B),
             ),
             const SizedBox(height: 16),
@@ -468,9 +484,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.notifications_none,
-              size: 64,
+              size: _getSafeScaledIconSize(baseSize: 64.0),
               color: Color(0xFF2E8B8B),
             ),
             const SizedBox(height: 16),
@@ -635,7 +651,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         children: [
                           Icon(
                             Icons.access_time,
-                            size: 12, // Smaller icon for compactness
+                            size: _getSafeScaledIconSize(baseSize: 12.0),
                             color: Colors.black.withOpacity(0.6),
                           ),
                           const SizedBox(width: 3),
@@ -693,10 +709,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ),
                         ),
                         const SizedBox(width: 3),
-                        const Icon(
+                        Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.white,
-                          size: 10, // Smaller icon
+                          size: _getSafeScaledIconSize(baseSize: 10.0),
                         ),
                       ],
                     ),
@@ -754,8 +770,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.notifications,
-                          size: 20, color: Colors.blue),
+                      Icon(Icons.notifications,
+                          size: _getSafeScaledIconSize(baseSize: 20.0), color: Colors.blue),
                       const SizedBox(width: 8),
                       Text(
                         _getSafeText('reminder') + ':',
@@ -800,8 +816,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.notifications_off,
-                                  size: 16, color: Colors.grey),
+                              Icon(Icons.notifications_off,
+                                  size: _getSafeScaledIconSize(baseSize: 16.0), color: Colors.grey),
                               const SizedBox(width: 6),
                               Text(
                                 _getSafeText('set_reminder'),
@@ -821,7 +837,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             _showReminderOptions(
                                 context, announcement, setState);
                           },
-                          icon: const Icon(Icons.add, size: 16),
+                          icon: Icon(Icons.add, size: _getSafeScaledIconSize(baseSize: 16.0)),
                           label: Text(_getSafeText('set_reminder')),
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.blue,

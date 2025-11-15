@@ -2,32 +2,47 @@ import 'dart:typed_data';
 import '../models/user.dart';
 import '../utils/secure_logger.dart';
 import 'api_service.dart';
+import 'secure_storage_service.dart';
 
 /// User service for the Eldera app
 class UserService {
   /// Get the current user profile
   static Future<User?> getCurrentUser() async {
     try {
-      // Fetch user from localhost API using the correct senior/profile endpoint
+      final token = await SecureStorageService.getAuthToken();
+      if (token != null) {
+        ApiService.setAuthToken(token);
+      }
       final response = await ApiService.get('senior/profile');
 
       if (response['success'] == true && response['data'] != null) {
         final data = response['data'];
 
         // Map Laravel API response to Flutter User model structure
+        final intAge = () {
+          final a = data['age'];
+          if (a is int) return a;
+          if (a is String) return int.tryParse(a) ?? 0;
+          return 0;
+        }();
         final mappedData = {
           'id': data['id']?.toString() ?? '',
-          'name': data['name'] ?? '',
-          'age': data['age'] ?? 0,
-          'phone_number': data['contact_number'] ?? '',
-          'profile_image_url': data['photo_path'],
-          'id_status': 'Senior Citizen', // Default for senior users
-          'is_dswd_pension_beneficiary': data['has_pension'] ?? false,
-          'birth_date': data['date_of_birth'],
-          'address': _buildAddressString(data['address']),
-          'guardian_name': null, // Not provided by Laravel API
-          'created_at': null, // Not provided by Laravel API
-          'updated_at': null, // Not provided by Laravel API
+          'name': data['name']?.toString() ?? '',
+          'age': intAge,
+          'phone_number': data['contact_number']?.toString() ?? '',
+          'profile_image_url': data['photo_path']?.toString(),
+          'id_status': (data['status'] ?? 'Senior Citizen').toString(),
+          'is_dswd_pension_beneficiary': (data['has_pension'] is bool)
+              ? data['has_pension']
+              : ((data['has_pension'] is num) ? data['has_pension'] != 0 : false),
+          'birth_date': data['date_of_birth']?.toString(),
+          'address': _buildAddressString(
+              (data['address'] is Map<String, dynamic>)
+                  ? data['address'] as Map<String, dynamic>
+                  : null),
+          'guardian_name': null,
+          'created_at': null,
+          'updated_at': null,
         };
 
         return User.fromJson(mappedData);
