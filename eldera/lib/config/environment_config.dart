@@ -61,7 +61,7 @@ class EnvironmentConfig {
           return const String.fromEnvironment(
             'API_URL_DEV',
             defaultValue:
-                'http://192.168.1.127:8000', // Updated to match Laravel server IP
+                'http://192.168.1.115:8000', // Updated to match Laravel server IP
           );
         } else {
           // For Android devices, use 10.0.2.2 which maps to host machine's localhost
@@ -69,13 +69,13 @@ class EnvironmentConfig {
           return const String.fromEnvironment(
             'API_URL_DEV',
             defaultValue:
-                'http://192.168.18.182:8000', // Updated to match Laravel server IP
+                'http://192.168.1.115:8000', // Updated to match Laravel server IP
           );
         }
     }
   }
 
-  // Legacy IMS API Configuration
+  // Legacy IMS API Configurationq
   static String get imsApiBaseUrl {
     switch (_environment) {
       case 'production':
@@ -219,4 +219,50 @@ class EnvironmentConfig {
         'maxLoginAttempts': maxLoginAttempts,
         'lockoutDuration': lockoutDuration.inMinutes,
       };
+
+  static Future<String> get supabaseUrl async {
+    await _loadSecureCredentials();
+    final cached = _secureCredentials?['supabase_url'];
+    if (cached != null && cached.isNotEmpty) return cached;
+    switch (_environment) {
+      case 'production':
+        return const String.fromEnvironment(
+          'SUPABASE_URL_PROD',
+          defaultValue: 'https://gpqqeufqershuyqogpqw.supabase.co',
+        );
+      case 'staging':
+        return const String.fromEnvironment(
+          'SUPABASE_URL_STAGING',
+          defaultValue: 'https://gpqqeufqershuyqogpqw.supabase.co',
+        );
+      default:
+        return const String.fromEnvironment(
+          'SUPABASE_URL_DEV',
+          defaultValue: 'https://gpqqeufqershuyqogpqw.supabase.co',
+        );
+    }
+  }
+
+  static Future<String> get supabaseAnonKey async {
+    await _loadSecureCredentials();
+    final cached = _secureCredentials?['supabase_anon_key'];
+    if (cached != null && cached.isNotEmpty) return cached;
+    switch (_environment) {
+      case 'production':
+        return const String.fromEnvironment(
+          'SUPABASE_ANON_KEY_PROD',
+          defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+        );
+      case 'staging':
+        return const String.fromEnvironment(
+          'SUPABASE_ANON_KEY_STAGING',
+          defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+        );
+      default:
+        return const String.fromEnvironment(
+          'SUPABASE_ANON_KEY_DEV',
+          defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+        );
+    }
+  }
 }

@@ -2,25 +2,30 @@ import 'package:intl/intl.dart';
 import '../models/announcement.dart';
 import '../utils/secure_logger.dart';
 import 'api_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Event service to fetch IMS events and adapt them for Home feed
 class EventService {
   /// Fetch IMS events and convert them to Announcement cards
   static Future<List<Announcement>> getAllEventsAsAnnouncements() async {
     try {
-      // Query all events via the main events endpoint to show all events
+      final client = Supabase.instance.client;
+      final result = await client.from('events').select();
+      if (result is List) {
+        return result
+            .map<Announcement>((e) => _eventToAnnouncement(
+                Map<String, dynamic>.from(e as Map<String, dynamic>)))
+            .toList();
+      }
       final response = await ApiService.get('events');
       if (response['success'] == true) {
         final data = response['data'];
-
         List<dynamic> items = [];
-        if (data is List) {
-          items = data;
-        } else if (data is Map) {
+        if (data is List) items = data;
+        if (data is Map) {
           final list = data['data'] ?? data['events'];
           if (list is List) items = list;
         }
-        // Convert all events to announcements (including past events for historical view)
         return items
             .map<Announcement>(
                 (e) => _eventToAnnouncement(Map<String, dynamic>.from(e)))

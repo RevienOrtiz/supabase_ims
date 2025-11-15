@@ -33,6 +33,7 @@ import 'eldera.dart';
 import 'services/service_manager.dart';
 import 'config/environment_config.dart';
 import 'services/accessibility_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,11 @@ void main() async {
     // 1. Initialize environment configuration (essential for app to work)
     await EnvironmentConfig.initialize();
     debugPrint('Environment configuration initialized successfully');
+
+    final supabaseUrl = await EnvironmentConfig.supabaseUrl;
+    final supabaseAnonKey = await EnvironmentConfig.supabaseAnonKey;
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+    debugPrint('Supabase initialized');
 
     // 2. Initialize timezone data (lightweight operation)
     tz.initializeTimeZones();

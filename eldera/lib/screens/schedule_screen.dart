@@ -118,6 +118,22 @@ class _ScheduleScreenState extends State<ScheduleScreen>
     );
   }
 
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
+  }
+
   Color _getCategoryColor(String category) {
     switch (category.toLowerCase()) {
       case 'health':
@@ -237,7 +253,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
           Icon(
             icon,
             color: color,
-            size: 24,
+            size: _getSafeScaledIconSize(),
           ),
           const SizedBox(height: 8),
           Text(
@@ -399,7 +415,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
             child: Icon(
               statusIcon,
               color: statusColor,
-              size: 24,
+              size: _getSafeScaledIconSize(),
             ),
           ),
           title: Text(
@@ -885,9 +901,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.chevron_left,
-              size: 20,
+              size: _getSafeScaledIconSize(baseSize: 20.0),
               color: Colors.black87,
             ),
           ),
@@ -905,9 +921,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.chevron_right,
-              size: 20,
+              size: _getSafeScaledIconSize(baseSize: 20.0),
               color: Colors.black87,
             ),
           ),
@@ -1186,7 +1202,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                         child: Icon(
                           iconData,
                           color: Colors.white,
-                          size: 24,
+                          size: _getSafeScaledIconSize(),
                         ),
                       ),
                       if (hasReminder)
@@ -1236,7 +1252,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                         children: [
                           Icon(
                             Icons.location_on,
-                            size: 16,
+                            size: _getSafeScaledIconSize(baseSize: 16.0),
                             color: Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
@@ -1262,7 +1278,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                         children: [
                           Icon(
                             Icons.access_time,
-                            size: 16,
+                            size: _getSafeScaledIconSize(baseSize: 16.0),
                             color: Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
@@ -1300,7 +1316,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                             children: [
                               Icon(
                                 Icons.notifications_active,
-                                size: 14,
+                                size: _getSafeScaledIconSize(baseSize: 14.0),
                                 color: Colors.orange[700],
                               ),
                               const SizedBox(width: 4),
@@ -1429,8 +1445,8 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.notifications,
-                          size: 20, color: Colors.blue),
+                      Icon(Icons.notifications,
+                          size: _getSafeScaledIconSize(baseSize: 20.0), color: Colors.blue),
                       const SizedBox(width: 8),
                       Text(
                         _getSafeText('reminder') + ':',
@@ -1450,7 +1466,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                                     _getSafeScaledFontSize(baseSize: 0.7)),
                           ),
                           backgroundColor: Colors.green.withOpacity(0.1),
-                          deleteIcon: const Icon(Icons.close, size: 16),
+                          deleteIcon: Icon(Icons.close, size: _getSafeScaledIconSize(baseSize: 16.0)),
                           onDeleted: () async {
                             final prefs = await SharedPreferences.getInstance();
                             final calendarSyncEnabled =
@@ -1731,9 +1747,9 @@ class _ScheduleScreenState extends State<ScheduleScreen>
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.notifications,
-                    size: 10,
+                    size: _getSafeScaledIconSize(baseSize: 10.0),
                     color: Colors.white,
                   ),
                 ),
@@ -1838,7 +1854,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
           ),
           child: Icon(
             icon,
-            size: 10,
+            size: _getSafeScaledIconSize(baseSize: 10.0),
             color: icon == Icons.favorite ? Colors.white : Colors.transparent,
           ),
         ),
@@ -1874,7 +1890,7 @@ class _ScheduleScreenState extends State<ScheduleScreen>
       ),
       child: Icon(
         icon == Icons.favorite ? Icons.favorite : Icons.notifications,
-        size: 10,
+        size: _getSafeScaledIconSize(baseSize: 10.0),
         color: Colors.white,
       ),
     );

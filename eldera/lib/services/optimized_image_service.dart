@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/memory_optimizer.dart';
 import '../utils/secure_logger.dart';
 
@@ -24,6 +25,7 @@ class OptimizedImageService {
     double? height,
     BoxFit fit = BoxFit.contain,
     bool enableMemoryOptimization = true,
+    bool preferHighQuality = false,
   }) async {
     try {
       // For low-end devices, use smaller image dimensions
@@ -39,9 +41,10 @@ class OptimizedImageService {
         fit: fit,
         cacheWidth: width?.toInt(),
         cacheHeight: height?.toInt(),
-        filterQuality: MemoryOptimizer.isBudgetDevice() 
-            ? FilterQuality.low 
-            : FilterQuality.medium,
+        // Use high filter quality for critical assets when requested
+        filterQuality: preferHighQuality
+            ? FilterQuality.high
+            : (MemoryOptimizer.isBudgetDevice() ? FilterQuality.low : FilterQuality.medium),
         errorBuilder: (context, error, stackTrace) {
           SecureLogger.error('Failed to load image: $assetPath - $error');
           return _buildErrorPlaceholder(width, height);
@@ -75,18 +78,31 @@ class OptimizedImageService {
     double? size,
     bool isLowMemoryMode = false,
   }) async {
-    // Use smaller logo for low-end devices
-    final logoSize = isLowMemoryMode || MemoryOptimizer.isBudgetDevice() 
-        ? (size ?? 120) * 0.8 
-        : size ?? 120;
+    // Prefer crisp rendering for the app logo across all devices
+    final logoSize = size ?? 120;
 
-    return await loadOptimizedImage(
-      assetPath: 'assets/images/eldera_logo.png',
-      width: logoSize,
-      height: logoSize,
-      fit: BoxFit.contain,
-      enableMemoryOptimization: true,
-    );
+    // Try to load SVG logo for vector-quality rendering if available
+    try {
+      // Using SvgPicture provides HD scaling at any size
+      final Widget svgLogo = SvgPicture.asset(
+        'assets/images/ELDERA-sss.svg',
+        width: logoSize,
+        height: logoSize,
+        fit: BoxFit.contain,
+      );
+      return svgLogo;
+    } catch (e) {
+      SecureLogger.error('Failed to load SVG logo, falling back to PNG: $e');
+      // Fallback to PNG with high-quality filtering and without memory downsizing
+      return await loadOptimizedImage(
+        assetPath: 'assets/images/eldera_logo.png',
+        width: logoSize,
+        height: logoSize,
+        fit: BoxFit.contain,
+        enableMemoryOptimization: false,
+        preferHighQuality: true,
+      );
+    }
   }
 
   /// Preload critical images for better performance

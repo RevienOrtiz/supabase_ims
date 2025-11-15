@@ -13,10 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         // Update existing pension applications to match senior's monthly income
-        DB::statement('UPDATE pension_applications p 
-                      JOIN seniors s ON p.senior_id = s.id 
-                      SET p.monthly_income = s.monthly_income 
-                      WHERE s.monthly_income IS NOT NULL');
+        // DB::statement('UPDATE pension_applications p 
+        //               JOIN seniors s ON p.senior_id = s.id 
+        //               SET p.monthly_income = s.monthly_income 
+        //               WHERE s.monthly_income IS NOT NULL');
+        if (Schema::hasColumn('seniors', 'monthly_income')) {
+            DB::statement("UPDATE pension_applications p SET monthly_income = s.monthly_income FROM applications a, seniors s WHERE p.application_id = a.id AND a.senior_id = s.id AND s.monthly_income IS NOT NULL");
+        }
     }
 
     /**

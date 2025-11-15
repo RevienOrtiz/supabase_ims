@@ -4,6 +4,7 @@ import 'notifications_screen.dart';
 import 'settings_screen.dart';
 import 'schedule_screen.dart';
 import '../services/language_service.dart';
+import '../services/font_size_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,6 +16,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final LanguageService _languageService = LanguageService.instance;
+  final FontSizeService _fontSizeService = FontSizeService.instance;
 
   final List<Widget> _screens = [
     const HomeScreen(), // index 0 - Home
@@ -40,6 +42,22 @@ class _MainScreenState extends State<MainScreen> {
     } catch (e) {
       return key.toUpperCase();
     }
+  }
+
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
   }
 
   @override
@@ -112,7 +130,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               child: Icon(
                 icon,
-                size: 24,
+                size: _getSafeScaledIconSize(),
                 color: isSelected ? const Color(0xFF006662) : Colors.white,
               ),
             ),

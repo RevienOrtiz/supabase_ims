@@ -153,18 +153,18 @@ class DashboardService
         // Single optimized query to get all age data at once
         $ageData = Senior::selectRaw('
                 CASE 
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 60 AND 65 THEN \'60-65\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 66 AND 70 THEN \'66-70\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 71 AND 75 THEN \'71-75\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 76 AND 80 THEN \'76-80\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 81 AND 85 THEN \'81-85\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 86 AND 90 THEN \'86-90\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= 90 THEN \'90+\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 60 AND 65 THEN \'60-65\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 66 AND 70 THEN \'66-70\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 71 AND 75 THEN \'71-75\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 76 AND 80 THEN \'76-80\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 81 AND 85 THEN \'81-85\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 86 AND 90 THEN \'86-90\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) >= 90 THEN \'90+\'
                 END as age_group,
                 sex,
                 COUNT(*) as count
             ')
-            ->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= 60')
+            ->whereRaw('EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) >= 60')
             ->groupBy('age_group', 'sex')
             ->get()
             ->groupBy('age_group');
@@ -428,13 +428,13 @@ class DashboardService
         $distribution = Senior::where('barangay', $seniorBarangayName)
             ->selectRaw('
                 CASE 
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 60 AND 65 THEN \'60-65\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 66 AND 70 THEN \'66-70\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 71 AND 75 THEN \'71-75\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 76 AND 80 THEN \'76-80\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 81 AND 85 THEN \'81-85\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 86 AND 90 THEN \'86-90\'
-                    WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) > 90 THEN \'90+\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 60 AND 65 THEN \'60-65\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 66 AND 70 THEN \'66-70\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 71 AND 75 THEN \'71-75\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 76 AND 80 THEN \'76-80\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 81 AND 85 THEN \'81-85\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 86 AND 90 THEN \'86-90\'
+                    WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) > 90 THEN \'90+\'
                 END as age_group,
                 sex,
                 COUNT(*) as count

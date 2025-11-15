@@ -36,10 +36,20 @@ try {
     
     // Reset auto-increment counters
     echo "Resetting auto-increment counters...\n";
-    \DB::statement('ALTER TABLE pension_applications AUTO_INCREMENT = 1');
-    \DB::statement('ALTER TABLE benefits_applications AUTO_INCREMENT = 1');
-    \DB::statement('ALTER TABLE applications AUTO_INCREMENT = 1');
-    \DB::statement('ALTER TABLE seniors AUTO_INCREMENT = 1');
+    $driver = \DB::getDriverName();
+    if ($driver === 'mysql') {
+        \DB::statement('ALTER TABLE pension_applications AUTO_INCREMENT = 1');
+        \DB::statement('ALTER TABLE benefits_applications AUTO_INCREMENT = 1');
+        \DB::statement('ALTER TABLE applications AUTO_INCREMENT = 1');
+        \DB::statement('ALTER TABLE seniors AUTO_INCREMENT = 1');
+    } else {
+        foreach (['pension_applications', 'benefits_applications', 'applications', 'seniors'] as $table) {
+            $row = \DB::selectOne("SELECT pg_get_serial_sequence(?, 'id') AS seq", [$table]);
+            if ($row && isset($row->seq) && $row->seq) {
+                \DB::statement("ALTER SEQUENCE {$row->seq} RESTART WITH 1");
+            }
+        }
+    }
     
     echo "\nDatabase cleanup completed successfully!\n";
     echo "All records have been deleted and counters reset.\n";

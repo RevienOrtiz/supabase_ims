@@ -60,10 +60,10 @@ class Barangay extends Model
                 SUM(CASE WHEN sex = \'Female\' THEN 1 ELSE 0 END) as female_count,
                 SUM(CASE WHEN has_pension = true THEN 1 ELSE 0 END) as with_pension_count,
                 SUM(CASE WHEN has_pension = false THEN 1 ELSE 0 END) as without_pension_count,
-                SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 60 AND 70 THEN 1 ELSE 0 END) as age_60_70,
-                SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 71 AND 80 THEN 1 ELSE 0 END) as age_71_80,
-                SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 81 AND 90 THEN 1 ELSE 0 END) as age_81_90,
-                SUM(CASE WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) > 90 THEN 1 ELSE 0 END) as age_90_plus
+                SUM(CASE WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 60 AND 70 THEN 1 ELSE 0 END) as age_60_70,
+                SUM(CASE WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 71 AND 80 THEN 1 ELSE 0 END) as age_71_80,
+                SUM(CASE WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) BETWEEN 81 AND 90 THEN 1 ELSE 0 END) as age_81_90,
+                SUM(CASE WHEN EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) > 90 THEN 1 ELSE 0 END) as age_90_plus
             ')
             ->first();
         

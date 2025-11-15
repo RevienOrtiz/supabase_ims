@@ -194,6 +194,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Get current user via AuthService (uses IMS token and /senior/profile)
       print('ProfileScreen: Attempting to fetch user data...');
       _currentUser = await AuthService.getCurrentUser();
+      if (_currentUser == null ||
+          _currentUser!.age == 0 ||
+          (_currentUser!.address == null || _currentUser!.address!.isEmpty)) {
+        final fallbackUser = await UserService.getCurrentUser();
+        if (fallbackUser != null) {
+          _currentUser = fallbackUser;
+        }
+      }
       
       if (_currentUser != null) {
         print('ProfileScreen: User data loaded successfully: ${_currentUser!.name}');
@@ -282,6 +290,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isTitle: isTitle,
       isSubtitle: isSubtitle,
     );
+  }
+
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
   }
 
   @override
@@ -401,10 +425,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: Color(0xFF4CAF50),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.camera_alt,
                                           color: Colors.white,
-                                          size: 16,
+                                          size: _getSafeScaledIconSize(baseSize: 16.0),
                                         ),
                                       ),
                                     ),
@@ -427,9 +451,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 8),
                   // Age
                   Text(
-                    _currentUser != null
+                    (_currentUser != null && _currentUser!.age > 0)
                         ? '${_currentUser!.age} ${_getSafeText('years_old')}'
-                        : _getSafeText('loading'),
+                        : 'Not specified',
                     style: TextStyle(
                       color: AppColors.textSecondaryOnPrimary,
                       fontSize: _getSafeScaledFontSize(),

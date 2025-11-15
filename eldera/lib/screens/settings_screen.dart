@@ -7,7 +7,6 @@ import '../services/auth_service.dart';
 import '../services/user_service.dart';
 import '../services/language_service.dart';
 import '../services/calendar_integration_service.dart';
-import '../services/gemini_tts_service.dart';
 import '../models/user.dart' as app_user;
 import 'profile_screen.dart';
 import 'login_screen.dart';
@@ -31,6 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _useGeminiTts = true;
   bool _geminiTtsConfigured = false;
   final TextEditingController _apiKeyController = TextEditingController();
+  
 
   @override
   void initState() {
@@ -51,7 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _loadUserData();
     await _loadProfileImage();
     await _loadCalendarSyncPreference();
-    await _loadGeminiTtsSettings();
   }
 
   Future<void> _loadFontSize() async {
@@ -143,6 +142,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       isTitle: isTitle,
       isSubtitle: isSubtitle,
     );
+  }
+
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
   }
 
   String _getSafeText(String key) {
@@ -354,8 +369,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 12),
                     _buildCalendarSyncItem(),
                     const SizedBox(height: 12),
-                    _buildGeminiTtsItem(),
-                    const SizedBox(height: 12),
                     _buildLogoutItem(),
                     const SizedBox(height: 16), // Extra padding at bottom
                   ],
@@ -400,7 +413,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Icon(
                   Icons.text_fields,
                   color: const Color(0xFF2E8B8B),
-                  size: 24,
+                  size: _getSafeScaledIconSize(),
                 ),
               ),
               const SizedBox(width: 16),
@@ -745,18 +758,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setBool('calendar_sync_enabled', enabled);
   }
 
-  Future<void> _loadGeminiTtsSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _useGeminiTts = prefs.getBool('use_gemini_tts') ?? true;
-      final apiKey = prefs.getString('gemini_api_key');
-      _geminiTtsConfigured = apiKey != null && apiKey.isNotEmpty;
-      if (_geminiTtsConfigured && apiKey != null) {
-        _apiKeyController.text = apiKey;
-      }
-    });
-  }
-
   Future<void> _saveGeminiTtsSettings() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('use_gemini_tts', _useGeminiTts);
@@ -1074,7 +1075,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Icon(
               Icons.logout,
               color: Colors.grey.shade600,
-              size: 24,
+              size: _getSafeScaledIconSize(),
             ),
           ),
           const SizedBox(width: 16),

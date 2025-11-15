@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('seniors', function (Blueprint $table) {
-            $table->boolean('certification')->nullable()->after('disability_specify');
-        });
+        if (!Schema::hasColumn('seniors', 'certification')) {
+            Schema::table('seniors', function (Blueprint $table) {
+                $table->boolean('certification')->nullable()->after('disability_specify');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('seniors', function (Blueprint $table) {
-            $table->dropColumn('certification');
-        });
+        if (Schema::hasColumn('seniors', 'certification')) {
+            Schema::table('seniors', function (Blueprint $table) {
+                $table->dropColumn('certification');
+            });
+        }
     }
 };

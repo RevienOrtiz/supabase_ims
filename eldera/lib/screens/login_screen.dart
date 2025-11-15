@@ -67,6 +67,22 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  double _getSafeScaledIconSize({
+    double baseSize = 24.0,
+    double scaleFactor = 1.0,
+  }) {
+    // Check if FontSizeService is properly initialized
+    if (!_fontSizeService.isInitialized) {
+      // Return default icon size if service not initialized
+      return baseSize * scaleFactor;
+    }
+
+    // Scale icon size based on font size
+    // Use a ratio of icon size to font size (24px icon for 20px font = 1.2 ratio)
+    double fontSizeRatio = _fontSizeService.fontSize / _fontSizeService.defaultFontSize;
+    return baseSize * fontSizeRatio * scaleFactor;
+  }
+
   Future<void> _checkLoginStatus() async {
     try {
       if (AuthService.isAuthenticated()) {
@@ -420,15 +436,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             } else if (snapshot.hasError) {
-                              return const Icon(
+                              return Icon(
                                 Icons.error,
-                                size: 112,
+                                size: _getSafeScaledIconSize(baseSize: 112.0),
                                 color: Colors.grey,
                               );
                             } else {
-                              return snapshot.data ?? const Icon(
+                              return snapshot.data ?? Icon(
                                 Icons.image,
-                                size: 112,
+                                size: _getSafeScaledIconSize(baseSize: 112.0),
                                 color: Colors.grey,
                               );
                             }
@@ -594,7 +610,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Icon(
                       Icons.info_outline,
                       color: Colors.white70,
-                      size: 24,
+                      size: _getSafeScaledIconSize(),
                     ),
                     const SizedBox(height: 8),
                     Text(

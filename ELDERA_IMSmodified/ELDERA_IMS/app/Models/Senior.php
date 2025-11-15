@@ -190,9 +190,9 @@ class Senior extends Model
 
     public function scopeByAgeRange($query, $minAge, $maxAge = null)
     {
-        $query->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= ?', [$minAge]);
+        $query->whereRaw('EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) >= ?', [$minAge]);
         if ($maxAge) {
-            $query->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) <= ?', [$maxAge]);
+            $query->whereRaw('EXTRACT(YEAR FROM age(CURRENT_DATE, date_of_birth)) <= ?', [$maxAge]);
         }
         return $query;
     }
